@@ -2,7 +2,7 @@
 
 import Image from "next/image" // Added for performance per instructions
 import allbg from "./allbg.webp"
-import Projects from "../ui/project"
+import Projects from "../ui/Project"
 import Header from "../ui/Header"
 import Intro from "../ui/Intro"
 import About from "../ui/About"
@@ -44,7 +44,7 @@ export default function Hero() {
         <div className="w-full flex flex-col items-center">
           
           {/* Header Section */}
-          <div className="w-full max-w-7xl mx-auto pt-6 pb-4 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Header />
           </div>
           
@@ -55,7 +55,7 @@ export default function Hero() {
           <div className="flex flex-col w-full space-y-20 md:space-y-32 lg:space-y-40 pb-20">
             
             {/* Intro / Hero */}
-            <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-16">
+            <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  md:pt-16">
               <Intro />
             </section>
             

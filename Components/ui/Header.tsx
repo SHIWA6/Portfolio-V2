@@ -25,7 +25,7 @@ const Header = () => {
     /* Layout Note: Using 'sticky' preserves layout space (Zero CLS) while floating.
       z-50 ensures it stays above all content.
     */
-    <nav className="sticky top-4 z-50 flex justify-center w-full px-4 mt-4 mb-12">
+    <nav className="sticky top-4 z-50 flex justify-center w-full px-4">
       <div className="relative group">
         {/* Subtle ambient glow behind the navbar */}
         <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-teal-500/20 rounded-full blur-xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />

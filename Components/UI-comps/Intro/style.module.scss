@@ -1,0 +1,49 @@
+.spotlightWrapper {
+  position: relative;
+  /* Crucial: Ensure z-index allows content to sit above the glow */
+  isolation: isolate; 
+}
+
+/* CLS SAFEGUARD: 
+   We use a pseudo-element for the border/glow. 
+   We do NOT apply border to the element itself, as adding/removing 
+   1px border changes layout size by 2px.
+*/
+.spotlightTarget {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -2px; /* Simulate border offset without affecting layout flow */
+    border-radius: inherit; /* Matches parent radius */
+    padding: 2px; /* Thickness of the border */
+    background: linear-gradient(45deg, transparent, rgba(56, 189, 248, 0.6), transparent);
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* Optional: Ambient glow behind */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at center, rgba(56, 189, 248, 0.15), transparent 70%);
+    opacity: 1;
+    z-index: -1;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+}
+
+/* Default state (hidden) to allow transition */
+.spotlightWrapper:not(.spotlightTarget)::before,
+.spotlightWrapper:not(.spotlightTarget)::after {
+  opacity: 0;
+}
