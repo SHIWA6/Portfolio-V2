@@ -48,6 +48,34 @@ const projects: ReadonlyArray<ProjectItem> = [
     link: "https://pulse-talk-l9dd.vercel.app/",
     techStack: ["NextJs", "TailwindCss", "TypeScript", "ExpressJS", "Socket.io", "Redis"],
   },
+  {
+    title: "Stakelytics",
+    description:
+      "A feature-rich React.js and Tailwind CSS application focused on delivering interactive game mechanics like Mines etc,"
+   , src: "/images/image.webp",
+    color: "#000000",
+    link: "https://gamble-gains-nine.vercel.app/",
+    techStack: ["React.js", "Tailwind css"],
+  },
+    {
+     title: "Portfolio",
+     description:
+       "A modern, interactive portfolio website showcasing projects with dynamic animations and responsive design.",
+     src: "/images/PORTFOLIO_WEB.webp",
+     color: "#000000",
+     link: "https://portfolio-v1-dusky-beta.vercel.app/",
+    techStack: [ "NextJS, TailwindCss"],
+   },
+
+
+  {
+    title: "CHEF-CLAUDE",
+    description: "A sleek, interactive AI-based cooking assistant built with React and Vite. Chef Claude lets users input ingredients and generates customized recipe suggestions using LLMs like ClaudeAPI or Hugging Face models.",
+    src:"/images/CHEF.webp",
+    color:"#000000",
+    link: "https://github.com/SHIWA6/CHEF_CLAUDE_10-06-2025"
+    , techStack: ["React.js", "Claude AI"]
+  }
   // ... other projects
 ];
 
