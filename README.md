@@ -21,7 +21,7 @@
 
 <br />
 
-![Portfolio Preview](public/Images/PORTFOLIO_WEB.webp)
+![Portfolio Preview](https://raw.githubusercontent.com/SHIWA6/Portfolio-V2/main/public/Images/PORTFOLIO_WEB.webp)
 
 </div>
 
@@ -192,12 +192,12 @@ Update your project data in the Projects component with:
 <div align="center">
 <table>
 <tr>
-<td><img src="public/Images/1.webp" width="400" alt="Screenshot 1"/></td>
-<td><img src="public/Images/2.webp" width="400" alt="Screenshot 2"/></td>
+<td><img src="https://raw.githubusercontent.com/SHIWA6/Portfolio-V2/main/public/Images/1.webp" width="400" alt="Screenshot 1"/></td>
+<td><img src="https://raw.githubusercontent.com/SHIWA6/Portfolio-V2/main/public/Images/2.webp" width="400" alt="Screenshot 2"/></td>
 </tr>
 <tr>
-<td><img src="public/Images/3.webp" width="400" alt="Screenshot 3"/></td>
-<td><img src="public/Images/aivora-desk-img.webp" width="400" alt="Screenshot 4"/></td>
+<td><img src="https://raw.githubusercontent.com/SHIWA6/Portfolio-V2/main/public/Images/3.webp" width="400" alt="Screenshot 3"/></td>
+<td><img src="https://raw.githubusercontent.com/SHIWA6/Portfolio-V2/main/public/Images/aivora-desk-img.webp" width="400" alt="Screenshot 4"/></td>
 </tr>
 </table>
 </div>
