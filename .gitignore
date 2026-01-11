@@ -42,9 +42,3 @@ next-env.d.ts
 # music files
 public/music/
 *.mp3
-
-# large images (optional)
-*.jpg
-*.jpeg
-*.png
-*.webp
