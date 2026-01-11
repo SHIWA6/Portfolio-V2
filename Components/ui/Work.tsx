@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   motion,
   useScroll,
@@ -7,7 +7,6 @@ import {
   useReducedMotion,
   type MotionValue,
 } from "framer-motion";
-import Image from "next/image";
 
 /* ================= TYPES ================= */
 interface SlideItem {
@@ -75,7 +74,7 @@ const slider2: SliderData = [
 ] as const;
 
 /* ================= MAIN ================= */
-export default function SlidingImages(): JSX.Element {
+export default function SlidingImages(): React.ReactElement {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState(true);
@@ -142,7 +141,7 @@ function InfiniteSlider({
   x,
   direction,
   duration,
-}: InfiniteSliderProps): JSX.Element {
+}: InfiniteSliderProps): React.ReactElement {
   const [isPaused, setIsPaused] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
@@ -150,15 +149,15 @@ function InfiniteSlider({
   const extendedData = [...data, ...data, ...data];
 
   return (
-    <div className="relative mb-8 last:mb-0">
+    <div className="relative mb-8 last:mb-0 overflow-hidden">
       <motion.div
         style={{ x }}
         className="flex gap-6 will-change-transform"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
       >
         <motion.div
           className="flex gap-6 flex-shrink-0"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
           animate={
             prefersReducedMotion || isPaused
               ? {}
@@ -189,7 +188,7 @@ interface SlideCardProps {
   item: SlideItem;
 }
 
-function SlideCard({ item }: SlideCardProps): JSX.Element {
+function SlideCard({ item }: SlideCardProps): React.ReactElement {
   const [imageLoaded, setImageLoaded] = useState(false);
   const aspectRatio = item.width / item.height;
 

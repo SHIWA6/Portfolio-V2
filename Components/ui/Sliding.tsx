@@ -1,14 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-interface SlidingProps {
-  onClick: () => void;
-}
+import Link from "next/link";
 
 // ============================================================================
 // STYLES
@@ -28,16 +21,15 @@ const styles = `
 // COMPONENT
 // ============================================================================
 
-const Sliding: React.FC<SlidingProps> = ({ onClick }) => {
+const Sliding: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <>
       <style>{styles}</style>
 
-      <button
-        type="button"
-        onClick={onClick}
+      <Link
+        href="/os"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         aria-label="Developer corner – open Mac interface"
@@ -101,7 +93,7 @@ const Sliding: React.FC<SlidingProps> = ({ onClick }) => {
             opacity: isHovered ? 1 : 0,
           }}
         />
-      </button>
+      </Link>
     </>
   );
 };

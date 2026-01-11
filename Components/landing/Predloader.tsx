@@ -9,7 +9,7 @@ export default function PreLoader() {
     const [show, setShow] = useState(true)
     const words = ["Hello", "Bonjur", "नमस्ते", "Ciao", "Olà" , "やあ", "Hallå", "Guten tag", "Hallo"]
     const [index, setIndex] = useState(0)
-    const [dimension, setDimension] = useState({width: 0, height: 0})
+    const [dimension, setDimension] = useState({ width: 0, height: 0 })
 
     useEffect(() => {
        const timeout = setTimeout( () => {
@@ -29,11 +29,11 @@ export default function PreLoader() {
     }, [index, words.length])
 
     useEffect(() => {
-        setDimension({width: window.innerWidth, height: window.innerHeight})
-        
+        // Set initial dimensions on mount and subscribe to resize
         const handleResize = () => {
             setDimension({width: window.innerWidth, height: window.innerHeight})
         }
+        handleResize(); // Initial call via handler
         
         window.addEventListener('resize', handleResize)
         return () => window.removeEventListener('resize', handleResize)

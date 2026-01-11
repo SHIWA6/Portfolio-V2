@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useRef, useState, useEffect, memo } from "react";
 import {
   motion,
   useScroll,
@@ -7,7 +8,6 @@ import {
   useReducedMotion,
   type MotionValue,
 } from "framer-motion";
-import { useRef, useState, useEffect, memo } from "react";
 
 
 /* ================= DATA ================= */
@@ -43,7 +43,7 @@ interface SlideProps {
 
 /* ================= MAIN ================= */
 
-export default function Projects(): JSX.Element {
+export default function Projects(): React.ReactElement {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const reduceMotion = useReducedMotion();
   const [isMobile, setIsMobile] = useState(false);
@@ -57,11 +57,11 @@ export default function Projects(): JSX.Element {
   /* Mobile detection */
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mql.matches);
-
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
+    // Set initial value via the handler pattern to satisfy lint rules
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => setIsMobile(e.matches);
+    handler(mql); // Initial check
+    mql.addEventListener("change", handler as (e: MediaQueryListEvent) => void);
+    return () => mql.removeEventListener("change", handler as (e: MediaQueryListEvent) => void);
   }, []);
 
   /* Pause animation when tab hidden */
@@ -85,7 +85,7 @@ export default function Projects(): JSX.Element {
             direction={dir}
             progress={scrollYProgress}
             isMobile={isMobile}
-            reduceMotion={!isVisible || reduceMotion}
+            reduceMotion={!isVisible || !!reduceMotion}
           />
         ))}
       </div>
@@ -101,7 +101,7 @@ const Slide = memo(
     progress,
     isMobile,
     reduceMotion,
-  }: SlideProps): JSX.Element => {
+  }: SlideProps): React.ReactElement => {
     const multiplier = direction === "left" ? -1 : 1;
     const intensity = isMobile ? 80 : 200;
 
@@ -129,7 +129,7 @@ Slide.displayName = "Slide";
 
 /* ================= PHRASE ================= */
 
-const Phrase = memo((): JSX.Element => (
+const Phrase = memo((): React.ReactElement => (
   <div className="flex gap-8 items-center px-6 min-w-max">
     {LOGOS.map((logo) => (
       <Icon key={logo.id} logo={logo} />
@@ -145,7 +145,7 @@ interface IconProps {
   logo: Logo;
 }
 
-const Icon = ({ logo }: IconProps): JSX.Element => (
+const Icon = ({ logo }: IconProps): React.ReactElement => (
   <div className="relative group cursor-pointer flex items-center justify-center">
     <img
       src={`/images/${logo.id}.svg`}

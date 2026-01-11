@@ -1,17 +1,16 @@
 "use client";
-import React from "react"
 
-import {
+import React, {
   useEffect,
   useRef,
-  type ReactElement,
+  type ReactNode,
 } from "react";
 import gsap from "gsap";
 
 /* ================= TYPES ================= */
 
 interface MagneticProps {
-  children: ReactElement;
+  children: ReactNode;
   strength?: number;
 }
 
@@ -20,8 +19,8 @@ interface MagneticProps {
 export default function Magnetic({
   children,
   strength = 0.35,
-}: MagneticProps): JSX.Element {
-  const magneticRef = useRef<HTMLElement | null>(null);
+}: MagneticProps): React.ReactElement {
+  const magneticRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = magneticRef.current;
@@ -70,8 +69,10 @@ export default function Magnetic({
     };
   }, [strength]);
 
-  /* Clone child safely with ref */
-  return React.cloneElement(children, {
-    ref: magneticRef,
-  });
+  /* Wrap children in a div with the ref instead of cloning */
+  return (
+    <div ref={magneticRef} style={{ display: 'inline-block' }}>
+      {children}
+    </div>
+  );
 }

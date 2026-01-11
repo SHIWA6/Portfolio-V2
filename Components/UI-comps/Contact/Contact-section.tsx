@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   motion,
   useScroll,
@@ -63,7 +63,7 @@ const SOCIAL_LINKS: SocialLink[] = [
 
 /* ================= MAIN COMPONENT ================= */
 
-export default function ContactSection(): JSX.Element {
+export default function ContactSection(): React.ReactElement {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState(true);
@@ -133,18 +133,18 @@ export default function ContactSection(): JSX.Element {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="relative flex-shrink-0"
+              className="relative shrink-0"
             >
               <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
                 {/* Skeleton loader */}
                 {!imageLoaded && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full animate-pulse" />
+                  <div className="absolute inset-0 bg-linear-to-br from-gray-800 to-gray-900 rounded-full animate-pulse" />
                 )}
                 
                 {/* Image container with fixed aspect ratio */}
                 <div className="absolute inset-0 rounded-full overflow-hidden ring-4 ring-white/20 ring-offset-4 ring-offset-black">
                   <img
-                    src="/images/me.jpeg"
+                    src="/images/reall.webp"
                     alt="Shiwa Pandey - Full Stack Developer"
                     width={192}
                     height={192}
@@ -184,7 +184,7 @@ export default function ContactSection(): JSX.Element {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-tight mb-4">
-                  Let's work
+                  Let&apos;s work
                   <br />
                   <span className="relative inline-block">
                     <span className="relative z-10">together</span>
@@ -199,8 +199,8 @@ export default function ContactSection(): JSX.Element {
                   </span>
                 </h2>
                 <p className="text-gray-400 text-lg md:text-xl max-w-2xl">
-                  Have a project in mind? Let's create something amazing together.
-                  I'm always open to discussing new opportunities.
+                  Have a project in mind? Let&apos;s create something amazing together.
+                  I&apos;m always open to discussing new opportunities.
                 </p>
               </motion.div>
             </div>
@@ -339,7 +339,7 @@ interface ContactButtonProps {
   delay: number;
 }
 
-function ContactButton({ link, delay }: ContactButtonProps): JSX.Element {
+function ContactButton({ link, delay }: ContactButtonProps): React.ReactElement {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -367,7 +367,7 @@ function ContactButton({ link, delay }: ContactButtonProps): JSX.Element {
       />
 
       {/* Icon */}
-      <span className={`text-2xl flex-shrink-0 relative z-10 transition-all duration-300 ${isHovered ? 'grayscale-0' : ''}`}>
+      <span className={`text-2xl shrink-0 relative z-10 transition-all duration-300 ${isHovered ? 'grayscale-0' : ''}`}>
         {link.icon}
       </span>
 
@@ -378,7 +378,7 @@ function ContactButton({ link, delay }: ContactButtonProps): JSX.Element {
 
       {/* Shimmer effect */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
+        className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent -skew-x-12"
         initial={{ x: "-200%" }}
         animate={{ x: isHovered ? "200%" : "-200%" }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
@@ -394,7 +394,7 @@ interface SocialLinkProps {
   delay: number;
 }
 
-function SocialLink({ social, delay }: SocialLinkProps): JSX.Element {
+function SocialLink({ social, delay }: SocialLinkProps): React.ReactElement {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -440,7 +440,7 @@ interface StatItemProps {
   value: string;
 }
 
-function StatItem({ label, value }: StatItemProps): JSX.Element {
+function StatItem({ label, value }: StatItemProps): React.ReactElement {
   return (
     <div className="flex items-center justify-between p-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg hover:bg-white/10 hover:border-white/20 transition-all duration-300">
       <span className="text-gray-400 text-sm">{label}</span>
@@ -455,7 +455,7 @@ interface BackToTopButtonProps {
   onClick: () => void;
 }
 
-function BackToTopButton({ onClick }: BackToTopButtonProps): JSX.Element {
+function BackToTopButton({ onClick }: BackToTopButtonProps): React.ReactElement {
   const [isHovered, setIsHovered] = useState(false);
 
   return (

@@ -1,9 +1,9 @@
 "use client"
 import Macbook from "../UI-comps/Macbook/macbook";
 
-export default function Intro(){
+export default function MacbookWrapper() {
     return(
-        <div>
+        <div className="h-full w-full">
             <Macbook />
         </div>
     )

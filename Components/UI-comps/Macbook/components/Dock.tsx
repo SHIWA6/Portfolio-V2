@@ -1,5 +1,6 @@
 import React from "react";
 import {useState} from "react"
+import { AppConfig, WindowState } from "../types";
 
 interface DockProps {
   apps: AppConfig[];

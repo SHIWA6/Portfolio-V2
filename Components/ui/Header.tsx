@@ -1,18 +1,18 @@
 "use client"
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 
 const Header = () => {
   const pathname = usePathname()
-  const [activeItem, setActiveItem] = useState('home')
-
-  useEffect(() => {
-    if (pathname === '/') setActiveItem('home')
-    else if (pathname === '/projects') setActiveItem('projects')
-    else if (pathname === '/blogs') setActiveItem('blogs')
+  
+  const activeItem = useMemo(() => {
+    if (pathname === '/') return 'home'
+    if (pathname === '/projects') return 'projects'
+    if (pathname === '/blogs') return 'blogs'
+    return 'home'
   }, [pathname])
 
   const navItems = [

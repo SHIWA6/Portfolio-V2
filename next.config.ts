@@ -1,12 +1,9 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,   // ❌ TS checking off
-  },
-  eslint: {
-    ignoreDuringBuilds: true,  // ❌ ESLint off
-  },
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  // TypeScript and ESLint are now enabled for production builds
+  // Remove these options to ensure type safety in production
 };
 
-module.exports = nextConfig;
+export default nextConfig;
 

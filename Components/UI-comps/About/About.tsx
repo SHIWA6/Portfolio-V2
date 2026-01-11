@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useMemo, type FC } from "react";
+import React, { useRef, useMemo, type FC } from "react";
 import { useInView, motion, type Variants } from "framer-motion";
 import Script from "next/script";
-import Image from "next/image";
 import styles from "./style.module.scss";
 
 const slideUp: Variants = {
@@ -27,18 +26,6 @@ const AboutPage: FC = () => {
 
   const description = useRef<HTMLDivElement>(null);
   const isInView = useInView(description, { once: true, margin: "-10%" });
-
-  const [isMobile, setIsMobile] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-
-    window.addEventListener("resize", checkMobile, { passive: true });
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   return (
     <div

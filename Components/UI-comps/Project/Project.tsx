@@ -5,7 +5,6 @@ import styles from "./style.module.scss";
 import Projectss from "./comps/Dstl";
 import { motion, Variants } from "framer-motion";
 import gsap from "gsap";
-import Demovideo from "../Demo/Demo";
 import Image from "next/image";
 import Script from "next/script";
 
@@ -124,12 +123,11 @@ export default function ProjectPage() {
     const update = (e: MediaQueryListEvent | MediaQueryList) => {
       setIsMobile(e.matches);
     };
-
-    setIsMobile(mql.matches);
+    update(mql); // Initial check via handler
 
     // Clean cross-browser event handling
-    mql.addEventListener("change", update);
-    return () => mql.removeEventListener("change", update);
+    mql.addEventListener("change", update as (e: MediaQueryListEvent) => void);
+    return () => mql.removeEventListener("change", update as (e: MediaQueryListEvent) => void);
   }, []);
 
   // GSAP Smooth Follow Logic

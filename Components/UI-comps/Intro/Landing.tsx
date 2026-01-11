@@ -37,7 +37,7 @@ const IntroCard = () => {
   }, [activeKey, sections]);
 
   // Helper to apply spotlight class safely
-  const getSpotlightClass = (id) => 
+  const getSpotlightClass = (id: string) => 
     `${styles.spotlightWrapper} ${activeKey === id ? styles.spotlightTarget : ''}`;
 
   return (
@@ -73,7 +73,7 @@ const IntroCard = () => {
            
           {/* --- Profile Image --- */}
           {/* Flex-shrink-0 prevents image squashing. Centered on mobile by parent items-center. */}
-          <div className={`relative group rounded-2xl flex-shrink-0 ${getSpotlightClass('profile')}`}>
+          <div className={`relative group rounded-2xl shrink-0 ${getSpotlightClass('profile')}`}>
             <motion.div 
                 whileHover={{ scale: 1.05 }}
                 className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden ring-2 ring-white bg-black z-10 will-change-transform"
@@ -152,28 +152,24 @@ const IntroCard = () => {
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4 pt-2 min-h-[50px]">
               <SocialIcon 
                 id="github" 
-                activeKey={activeKey} 
                 getSpotlightClass={getSpotlightClass}
                 href="https://github.com/SHIWA6" 
                 icon={<FaGithub className="w-5 h-5 md:w-6 md:h-6" />} 
               />
               <SocialIcon 
                 id="twitter" 
-                activeKey={activeKey} 
                 getSpotlightClass={getSpotlightClass}
                 href="https://x.com/testcricforlife" 
                 icon={<FaTwitter className="w-5 h-5 md:w-6 md:h-6" />} 
               />
               <SocialIcon 
                 id="leetcode" 
-                activeKey={activeKey} 
                 getSpotlightClass={getSpotlightClass}
                 href="https://leetcode.com/SHIWA6" 
                 icon={<SiLeetcode className="w-5 h-5 md:w-6 md:h-6" />} 
               />
               <SocialIcon 
                 id="linkedin" 
-                activeKey={activeKey} 
                 getSpotlightClass={getSpotlightClass}
                 href="https://www.linkedin.com/in/shiva-pandey-41978a308" 
                 icon={<FaLinkedin className="w-5 h-5 md:w-6 md:h-6" />} 
@@ -239,7 +235,14 @@ const IntroCard = () => {
 };
 
 // Social Icon Sub-component
-const SocialIcon = ({ id, activeKey, href, icon, getSpotlightClass }) => (
+interface SocialIconProps {
+  id: string;
+  href: string;
+  icon: React.ReactNode;
+  getSpotlightClass: (id: string) => string;
+}
+
+const SocialIcon = ({ id, href, icon, getSpotlightClass }: SocialIconProps) => (
   <div className={`rounded-xl shrink-0 ${getSpotlightClass(id)}`}>
       <motion.a
         whileHover={{ scale: 1.1, y: -2 }}

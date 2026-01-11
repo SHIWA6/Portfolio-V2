@@ -1,6 +1,6 @@
 "use client";
 
-import {
+import React, {
   useEffect,
   useRef,
   type ReactNode,
@@ -23,7 +23,7 @@ export default function RoundedButton({
   children,
   backgroundColor = "#455CE9",
   ...attributes
-}: RoundedButtonProps): JSX.Element {
+}: RoundedButtonProps): React.ReactElement {
   const circleRef = useRef<HTMLDivElement | null>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const timeoutRef = useRef<number | null>(null);

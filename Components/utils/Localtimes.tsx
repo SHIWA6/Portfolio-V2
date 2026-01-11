@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Space_Mono } from "next/font/google";
 
 const space_mono = Space_Mono({ 
@@ -9,16 +9,24 @@ const space_mono = Space_Mono({
   weight: '400'
 });
 
+// Use useSyncExternalStore to safely handle hydration
+function useHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
+
 const LocalTime = () => {
-  const [currentTime, setCurrentTime] = useState(null);
+  const [currentTime, setCurrentTime] = useState<string>("--:--:--");
+  const isHydrated = useHydrated();
 
   useEffect(() => {
-    setCurrentTime(new Date());
-
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
+    // Only runs on client after hydration
+    const updateTime = () => setCurrentTime(new Date().toLocaleTimeString());
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -31,7 +39,7 @@ const LocalTime = () => {
         className="hover:text-[#00FFD1]/90 transition-all duration-100"
       >
         <span className="md:text-sm text-base">
-          {currentTime ? currentTime.toLocaleTimeString() : "--:--:--"}
+          {isHydrated ? currentTime : "--:--:--"}
         </span>
       </a>
       <span className={`text-sm ${space_mono.className}`}> (GMT+5:30)</span>
