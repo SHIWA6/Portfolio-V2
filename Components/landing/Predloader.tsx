@@ -3,7 +3,7 @@ import { Variants } from "framer-motion";
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, useState } from "react"
-import styles from './preloader.module.css'
+import styles from './Predloader.module.scss'
 
 export default function PreLoader() {
     const [show, setShow] = useState(true)
