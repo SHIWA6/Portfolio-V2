@@ -120,6 +120,7 @@ export interface UsePlaylistReturn {
   nextTrack: () => void;
   previousTrack: () => void;
   clearPlaylist: () => void;
+  resetToDefaults: () => Promise<void>;
   isLoading: boolean;
 }
 

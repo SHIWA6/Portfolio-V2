@@ -8,8 +8,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Track, UsePlaylistReturn } from '../types';
 import { createTrackFromUrl, extractVideoId } from '../utils';
+import { defaultYouTubeUrls } from '../data/defaultSongs';
 
 const STORAGE_KEY = 'youtube-music-playlist';
+const DEFAULTS_LOADED_KEY = 'youtube-music-defaults-loaded';
 
 /**
  * Custom hook for managing the music playlist
@@ -31,20 +33,60 @@ export function usePlaylist(): UsePlaylistReturn {
 
   // Load playlist from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as Track[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setPlaylist(parsed);
-          setCurrentIndex(0);
+    const loadPlaylist = async () => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const defaultsLoaded = localStorage.getItem(DEFAULTS_LOADED_KEY);
+        
+        if (stored) {
+          // Load existing playlist from localStorage
+          const parsed = JSON.parse(stored) as Track[];
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setPlaylist(parsed);
+            setCurrentIndex(0);
+          }
+        } else if (!defaultsLoaded) {
+          // First time user - load default songs
+          setIsLoading(true);
+          const defaultTracks: Track[] = [];
+          const loadedVideoIds = new Set<string>();
+          
+          for (const url of defaultYouTubeUrls) {
+            try {
+              // Skip duplicate URLs (same video ID)
+              const videoId = extractVideoId(url);
+              if (videoId && loadedVideoIds.has(videoId)) {
+                console.warn('Skipping duplicate song:', url);
+                continue;
+              }
+              
+              const result = await createTrackFromUrl(url);
+              if (result.success && result.data) {
+                loadedVideoIds.add(result.data.videoId);
+                defaultTracks.push(result.data);
+              }
+            } catch (error) {
+              console.error('Failed to load default song:', url, error);
+            }
+          }
+          
+          if (defaultTracks.length > 0) {
+            setPlaylist(defaultTracks);
+            setCurrentIndex(0);
+            // Mark that defaults have been loaded
+            localStorage.setItem(DEFAULTS_LOADED_KEY, 'true');
+          }
+          
+          setIsLoading(false);
         }
+      } catch (error) {
+        console.error('Failed to load playlist from localStorage:', error);
+      } finally {
+        setIsInitialized(true);
       }
-    } catch (error) {
-      console.error('Failed to load playlist from localStorage:', error);
-    } finally {
-      setIsInitialized(true);
-    }
+    };
+    
+    loadPlaylist();
   }, []);
 
   // Persist playlist to localStorage whenever it changes
@@ -191,6 +233,43 @@ export function usePlaylist(): UsePlaylistReturn {
     setCurrentIndex(-1);
   }, []);
 
+  /**
+   * Resets playlist to default songs
+   */
+  const resetToDefaults = useCallback(async () => {
+    setIsLoading(true);
+    const defaultTracks: Track[] = [];
+    const loadedVideoIds = new Set<string>();
+    
+    try {
+      for (const url of defaultYouTubeUrls) {
+        try {
+          // Skip duplicate URLs (same video ID)
+          const videoId = extractVideoId(url);
+          if (videoId && loadedVideoIds.has(videoId)) {
+            console.warn('Skipping duplicate song:', url);
+            continue;
+          }
+          
+          const result = await createTrackFromUrl(url);
+          if (result.success && result.data) {
+            loadedVideoIds.add(result.data.videoId);
+            defaultTracks.push(result.data);
+          }
+        } catch (error) {
+          console.error('Failed to load default song:', url, error);
+        }
+      }
+      
+      if (defaultTracks.length > 0) {
+        setPlaylist(defaultTracks);
+        setCurrentIndex(0);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     playlist,
     currentTrack,
@@ -201,6 +280,7 @@ export function usePlaylist(): UsePlaylistReturn {
     nextTrack,
     previousTrack,
     clearPlaylist,
+    resetToDefaults,
     isLoading,
   };
 }

@@ -6,17 +6,18 @@
  */
 
 import React, { useState, useCallback, useRef } from 'react';
-import { Plus, Loader2, Link, AlertCircle } from 'lucide-react';
+import { Plus, Loader2, Link, AlertCircle, RotateCcw } from 'lucide-react';
 
 interface AddSongInputProps {
   onAdd: (url: string) => Promise<{ success: boolean; error?: string }>;
+  onResetToDefaults?: () => Promise<void>;
   isLoading: boolean;
 }
 
 /**
  * Input component for adding songs via YouTube URL
  */
-export const AddSongInput: React.FC<AddSongInputProps> = ({ onAdd, isLoading }) => {
+export const AddSongInput: React.FC<AddSongInputProps> = ({ onAdd, onResetToDefaults, isLoading }) => {
   const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,6 +45,14 @@ export const AddSongInput: React.FC<AddSongInputProps> = ({ onAdd, isLoading }) 
     },
     [url, onAdd]
   );
+
+  // Handle reset to defaults
+  const handleReset = useCallback(async () => {
+    if (onResetToDefaults && !isLoading) {
+      setError(null);
+      await onResetToDefaults();
+    }
+  }, [onResetToDefaults, isLoading]);
 
   // Handle input change
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,6 +114,21 @@ export const AddSongInput: React.FC<AddSongInputProps> = ({ onAdd, isLoading }) 
           )}
         </button>
       </form>
+
+      {/* Reset to defaults button */}
+      {onResetToDefaults && (
+        <button
+          onClick={handleReset}
+          disabled={isLoading}
+          className="mt-2 w-full px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg
+                     text-gray-400 hover:text-white text-xs font-medium
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     transition-colors flex items-center justify-center gap-2"
+        >
+          <RotateCcw className="w-3 h-3" />
+          <span>Reset to Default Songs</span>
+        </button>
+      )}
 
       {/* Error message */}
       {error && (

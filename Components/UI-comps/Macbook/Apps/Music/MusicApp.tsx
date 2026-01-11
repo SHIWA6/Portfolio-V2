@@ -43,6 +43,7 @@ const MusicApp: React.FC = () => {
     playTrack,
     nextTrack,
     previousTrack,
+    resetToDefaults,
     isLoading,
   } = usePlaylist();
 
@@ -148,7 +149,11 @@ const MusicApp: React.FC = () => {
         <div className="w-64 shrink-0 flex flex-col border-r border-white/10 bg-black/20 min-h-0">
           {/* Add song input - fixed height */}
           <div className="shrink-0">
-            <AddSongInput onAdd={addTrack} isLoading={isLoading} />
+            <AddSongInput 
+              onAdd={addTrack} 
+              onResetToDefaults={resetToDefaults}
+              isLoading={isLoading} 
+            />
           </div>
           
           {/* Playlist - scrollable with isolation */}
