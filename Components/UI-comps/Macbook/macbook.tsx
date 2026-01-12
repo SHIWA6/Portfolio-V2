@@ -30,14 +30,38 @@ const useWindowManager = () => {
         );
       }
 
+      // Responsive window sizing
+      const isMobile = window.innerWidth < 768;
+      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+      
+      let width: number, height: number, x: number, y: number;
+      
+      if (isMobile) {
+        // Full screen on mobile (with padding for dock)
+        width = window.innerWidth - 8;
+        height = window.innerHeight - 100; // Space for menubar + dock
+        x = 4;
+        y = 28; // Below menubar
+      } else if (isTablet) {
+        width = Math.min(600, window.innerWidth - 40);
+        height = Math.min(450, window.innerHeight - 120);
+        x = 20 + prev.length * 20;
+        y = 40 + prev.length * 20;
+      } else {
+        width = 700;
+        height = 500;
+        x = 100 + prev.length * 30;
+        y = 100 + prev.length * 30;
+      }
+
       const newWindow: WindowState = {
         id: `${appId}-${Date.now()}`,
         appId,
         title,
-        x: 100 + prev.length * 30,
-        y: 100 + prev.length * 30,
-        width: 700,
-        height: 500,
+        x,
+        y,
+        width,
+        height,
         zIndex: maxZIndex + 1,
         isMinimized: false,
         isFocused: true,

@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo, memo } from "react";
 import {
   motion,
   useScroll,
@@ -78,11 +78,22 @@ export default function SlidingImages(): React.ReactElement {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState(true);
+  const [isInViewport, setIsInViewport] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
+
+  // Only animate when in viewport - CRITICAL for performance
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInViewport(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handleVisibility = () =>
@@ -92,38 +103,38 @@ export default function SlidingImages(): React.ReactElement {
       document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
+  const shouldAnimate = isVisible && isInViewport && !prefersReducedMotion;
+
   const x1: MotionValue<number> = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion || !isVisible ? [0, 0] : [0, 150]
+    shouldAnimate ? [0, 150] : [0, 0]
   );
   const x2: MotionValue<number> = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion || !isVisible ? [0, 0] : [0, -150]
-  );
-  const height: MotionValue<number> = useTransform(
-    scrollYProgress,
-    [0, 0.9],
-    [50, 0]
+    shouldAnimate ? [0, -150] : [0, 0]
   );
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden py-24 "
+      className="relative w-full overflow-hidden py-24"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.05),rgba(255,255,255,0))]" />
-      
-      <InfiniteSlider data={slider1} x={x1} direction="left" duration={40} />
-      <InfiniteSlider data={slider2} x={x2} direction="right" duration={50} />
-
-      <motion.div
-        style={{ height }}
-        className="absolute left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none"
-      >
-        <div className="w-[40vw] max-w-[500px] aspect-square rounded-full bg-gradient-to-br from-blue-400/20 via-purple-400/20 to-pink-400/20 blur-3xl" />
-      </motion.div>
+      <InfiniteSlider 
+        data={slider1} 
+        x={x1} 
+        direction="left" 
+        duration={40} 
+        isActive={shouldAnimate}
+      />
+      <InfiniteSlider 
+        data={slider2} 
+        x={x2} 
+        direction="right" 
+        duration={50} 
+        isActive={shouldAnimate}
+      />
     </div>
   );
 }
@@ -134,67 +145,72 @@ interface InfiniteSliderProps {
   x: MotionValue<number>;
   direction: "left" | "right";
   duration: number;
+  isActive: boolean;
 }
 
-function InfiniteSlider({
+const InfiniteSlider = memo(function InfiniteSlider({
   data,
   x,
   direction,
   duration,
+  isActive,
 }: InfiniteSliderProps): React.ReactElement {
-  const [isPaused, setIsPaused] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
-
-  // Triple the data for seamless looping
-  const extendedData = [...data, ...data, ...data];
+  // Memoize extended data to prevent recreation
+  const extendedData = useMemo(() => [...data, ...data, ...data], [data]);
+  
+  // CSS animation class instead of Framer Motion animate prop
+  const animationStyle = useMemo(() => {
+    if (!isActive) return {};
+    
+    const totalWidth = data.length * 424; // 400px card + 24px gap
+    return {
+      animation: `slide-${direction} ${duration}s linear infinite`,
+      '--slide-distance': `-${totalWidth}px`,
+    } as React.CSSProperties;
+  }, [isActive, direction, duration, data.length]);
 
   return (
     <div className="relative mb-8 last:mb-0 overflow-hidden">
       <motion.div
         style={{ x }}
-        className="flex gap-6 will-change-transform"
+        className="flex gap-6"
       >
-        <motion.div
+        <div
           className="flex gap-6 flex-shrink-0"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          animate={
-            prefersReducedMotion || isPaused
-              ? {}
-              : {
-                  x: direction === "left" ? [0, -100 / 3 + "%"] : [0, 100 / 3 + "%"],
-                }
-          }
-          transition={{
-            x: {
-              repeat: Infinity,
-              repeatType: "loop",
-              duration,
-              ease: "linear",
-            },
-          }}
+          style={animationStyle}
         >
           {extendedData.map((item, index) => (
             <SlideCard key={`${item.src}-${index}`} item={item} />
           ))}
-        </motion.div>
+        </div>
       </motion.div>
+      
+      {/* CSS Keyframes injected once */}
+      <style jsx>{`
+        @keyframes slide-left {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(var(--slide-distance)); }
+        }
+        @keyframes slide-right {
+          0% { transform: translateX(var(--slide-distance)); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
     </div>
   );
-}
+});
 
 /* ================= SLIDE CARD ================= */
 interface SlideCardProps {
   item: SlideItem;
 }
 
-function SlideCard({ item }: SlideCardProps): React.ReactElement {
+const SlideCard = memo(function SlideCard({ item }: SlideCardProps): React.ReactElement {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const aspectRatio = item.width / item.height;
 
   return (
     <div
-      className="group relative flex-shrink-0 w-[400px] h-[250px] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]"
+      className="group relative flex-shrink-0 w-[400px] h-[250px] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
       style={{ backgroundColor: item.color }}
     >
       {/* Skeleton loader */}
@@ -202,41 +218,27 @@ function SlideCard({ item }: SlideCardProps): React.ReactElement {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
       )}
 
-      {/* Image container with fixed aspect ratio to prevent CLS */}
-      <div
-        className="relative w-full h-full"
-        style={{
-          aspectRatio: aspectRatio.toString(),
-        }}
-      >
-        <img
-          src={item.src}
-          alt={item.alt}
-          loading="lazy"
-          decoding="async"
-          className={`w-full h-full object-cover transition-all duration-700 ${
-            imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
-          }`}
-          onLoad={() => setImageLoaded(true)}
-          width={item.width}
-          height={item.height}
-        />
+      <img
+        src={item.src}
+        alt={item.alt}
+        loading="lazy"
+        decoding="async"
+        className={`w-full h-full object-cover transition-opacity duration-300 ${
+          imageLoaded ? "opacity-100" : "opacity-0"
+        }`}
+        onLoad={() => setImageLoaded(true)}
+        width={item.width}
+        height={item.height}
+      />
 
-        {/* Overlay gradient on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-        {/* Optional: Add title overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-          <p className="text-white font-medium text-lg drop-shadow-lg">
+      {/* Simple overlay on hover - no complex animations */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300">
+        <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <p className="text-white font-medium text-base">
             {item.alt}
           </p>
         </div>
       </div>
-
-      {/* Shine effect */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-      </div>
     </div>
   );
-}
+});

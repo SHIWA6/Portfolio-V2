@@ -19,9 +19,10 @@
 
 'use client';
 
-import React, { useEffect, useCallback, useId, useRef } from 'react';
+import React, { useEffect, useCallback, useId, useRef, useState } from 'react';
 import { usePlaylist, useYouTubePlayer } from './hooks';
 import { Player, Playlist, NowPlaying, AddSongInput } from './components';
+import { List, X } from 'lucide-react';
 
 /**
  * Main Music App component
@@ -32,6 +33,21 @@ const MusicApp: React.FC = () => {
   const playerId = useId().replace(/:/g, '-');
   const containerIdRef = `youtube-player-${playerId}`;
   const lastVideoIdRef = useRef<string | null>(null);
+  
+  // Mobile sidebar state
+  const [isMobile, setIsMobile] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 640;
+      setIsMobile(mobile);
+      if (!mobile) setShowSidebar(false); // Reset when going to desktop
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Initialize playlist hook
   const {
@@ -144,13 +160,36 @@ const MusicApp: React.FC = () => {
       />
 
       {/* Main content area */}
-      <div className="flex-1 flex min-h-0">
-        {/* Left Panel: Playlist */}
-        <div className="w-64 shrink-0 flex flex-col border-r border-white/10 bg-black/20 min-h-0">
+      <div className="flex-1 flex min-h-0 relative">
+        {/* Mobile: Toggle sidebar button */}
+        {isMobile && (
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="absolute top-2 left-2 z-20 p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+            aria-label={showSidebar ? 'Close playlist' : 'Open playlist'}
+          >
+            {showSidebar ? <X className="w-4 h-4" /> : <List className="w-4 h-4" />}
+          </button>
+        )}
+
+        {/* Left Panel: Playlist - Responsive */}
+        <div 
+          className={`
+            ${isMobile 
+              ? `absolute inset-y-0 left-0 z-10 w-64 transform transition-transform duration-200 ${showSidebar ? 'translate-x-0' : '-translate-x-full'}`
+              : 'w-48 sm:w-56 md:w-64 shrink-0'
+            } 
+            flex flex-col border-r border-white/10 bg-black/90 sm:bg-black/20 min-h-0
+          `}
+        >
           {/* Add song input - fixed height */}
           <div className="shrink-0">
             <AddSongInput 
-              onAdd={addTrack} 
+              onAdd={async (track) => { 
+                const result = await addTrack(track); 
+                if (isMobile) setShowSidebar(false); 
+                return result;
+              }} 
               onResetToDefaults={resetToDefaults}
               isLoading={isLoading} 
             />
@@ -163,16 +202,25 @@ const MusicApp: React.FC = () => {
               overflowY: 'auto',
               overflowX: 'hidden',
               overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             <Playlist
               tracks={playlist}
               currentIndex={currentIndex}
-              onPlay={handlePlayTrack}
+              onPlay={(index) => { handlePlayTrack(index); if (isMobile) setShowSidebar(false); }}
               onRemove={removeTrack}
             />
           </div>
         </div>
+
+        {/* Mobile: Backdrop overlay */}
+        {isMobile && showSidebar && (
+          <div 
+            className="absolute inset-0 bg-black/50 z-[5]" 
+            onClick={() => setShowSidebar(false)}
+          />
+        )}
 
         {/* Right Panel: Now Playing */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
@@ -182,6 +230,7 @@ const MusicApp: React.FC = () => {
               overflowY: 'auto',
               overflowX: 'hidden',
               overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             <NowPlaying track={currentTrack} isPlaying={isPlaying} />
@@ -203,8 +252,8 @@ const MusicApp: React.FC = () => {
         disabled={!currentTrack}
       />
 
-      {/* Keyboard shortcuts hint */}
-      <div className="px-4 py-1.5 bg-black/40 text-[10px] text-gray-500 flex items-center justify-center gap-4">
+      {/* Keyboard shortcuts hint - hidden on mobile */}
+      <div className="hidden sm:flex px-4 py-1.5 bg-black/40 text-[10px] text-gray-500 items-center justify-center gap-4">
         <span><kbd className="px-1 py-0.5 bg-white/10 rounded text-[9px]">Space</kbd> Play/Pause</span>
         <span><kbd className="px-1 py-0.5 bg-white/10 rounded text-[9px]">←</kbd> Previous</span>
         <span><kbd className="px-1 py-0.5 bg-white/10 rounded text-[9px]">→</kbd> Next</span>

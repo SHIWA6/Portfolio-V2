@@ -30,7 +30,7 @@ const Header = () => {
         {/* Subtle ambient glow behind the navbar */}
         <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-teal-500/20 rounded-full blur-xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
         
-        <div className="relative backdrop-blur-2xl bg-black/40 border border-white/10 shadow-2xl shadow-black/50 rounded-full w-fit mx-auto overflow-hidden ring-1 ring-white/5">
+        <div className="relative md:backdrop-blur-2xl bg-black/80 md:bg-black/40 border border-white/10 shadow-lg md:shadow-2xl shadow-black/50 rounded-full w-fit mx-auto overflow-hidden ring-1 ring-white/5">
           <div className="px-1.5 py-1.5">
             <ul className="flex items-center gap-1">
               {navItems.map((item) => {

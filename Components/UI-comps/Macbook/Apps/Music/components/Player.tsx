@@ -60,10 +60,10 @@ export const Player: React.FC<PlayerProps> = ({
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="flex flex-col gap-2 px-4 py-3 bg-black/30 backdrop-blur-sm">
+    <div className="flex flex-col gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 bg-black/30">
       {/* Seek bar */}
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] text-gray-400 w-8 text-right font-mono">
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        <span className="text-[9px] sm:text-[10px] text-gray-400 w-7 sm:w-8 text-right font-mono">
           {formatDuration(currentTime)}
         </span>
         <div className="relative flex-1 group">
@@ -74,17 +74,19 @@ export const Player: React.FC<PlayerProps> = ({
             value={currentTime}
             onChange={handleSeek}
             disabled={disabled}
-            className="w-full h-1 bg-gray-600 rounded-full appearance-none cursor-pointer
+            className="w-full h-1.5 sm:h-1 bg-gray-600 rounded-full appearance-none cursor-pointer touch-pan-x
                        disabled:cursor-not-allowed disabled:opacity-50
                        [&::-webkit-slider-thumb]:appearance-none
-                       [&::-webkit-slider-thumb]:w-0
-                       [&::-webkit-slider-thumb]:h-0
-                       [&::-webkit-slider-thumb]:opacity-0
-                       group-hover:[&::-webkit-slider-thumb]:w-3
-                       group-hover:[&::-webkit-slider-thumb]:h-3
-                       group-hover:[&::-webkit-slider-thumb]:opacity-100
+                       [&::-webkit-slider-thumb]:w-3
+                       [&::-webkit-slider-thumb]:h-3
                        [&::-webkit-slider-thumb]:bg-white
                        [&::-webkit-slider-thumb]:rounded-full
+                       sm:[&::-webkit-slider-thumb]:w-0
+                       sm:[&::-webkit-slider-thumb]:h-0
+                       sm:[&::-webkit-slider-thumb]:opacity-0
+                       sm:group-hover:[&::-webkit-slider-thumb]:w-3
+                       sm:group-hover:[&::-webkit-slider-thumb]:h-3
+                       sm:group-hover:[&::-webkit-slider-thumb]:opacity-100
                        [&::-webkit-slider-thumb]:transition-all
                        [&::-webkit-slider-thumb]:duration-150"
             style={{
@@ -93,7 +95,7 @@ export const Player: React.FC<PlayerProps> = ({
             aria-label="Seek"
           />
         </div>
-        <span className="text-[10px] text-gray-400 w-8 font-mono">
+        <span className="text-[9px] sm:text-[10px] text-gray-400 w-7 sm:w-8 font-mono">
           {formatDuration(duration)}
         </span>
       </div>
@@ -101,44 +103,44 @@ export const Player: React.FC<PlayerProps> = ({
       {/* Controls */}
       <div className="flex items-center justify-between">
         {/* Playback controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={onPrevious}
             disabled={disabled}
-            className="p-1.5 text-gray-300 hover:text-white transition-colors
+            className="p-1.5 sm:p-1.5 text-gray-300 hover:text-white active:text-white transition-colors
                        disabled:text-gray-600 disabled:cursor-not-allowed"
             aria-label="Previous track"
           >
-            <SkipBack className="w-4 h-4" fill="currentColor" />
+            <SkipBack className="w-4 h-4 sm:w-4 sm:h-4" fill="currentColor" />
           </button>
 
           <button
             onClick={onPlayPause}
             disabled={disabled}
-            className="p-2 bg-white rounded-full text-black hover:scale-105
+            className="p-2.5 sm:p-2 bg-white rounded-full text-black active:scale-95 sm:hover:scale-105
                        transition-transform disabled:bg-gray-600 disabled:cursor-not-allowed"
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
-              <Pause className="w-4 h-4" fill="currentColor" />
+              <Pause className="w-4 h-4 sm:w-4 sm:h-4" fill="currentColor" />
             ) : (
-              <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
+              <Play className="w-4 h-4 sm:w-4 sm:h-4 ml-0.5" fill="currentColor" />
             )}
           </button>
 
           <button
             onClick={onNext}
             disabled={disabled}
-            className="p-1.5 text-gray-300 hover:text-white transition-colors
+            className="p-1.5 sm:p-1.5 text-gray-300 hover:text-white active:text-white transition-colors
                        disabled:text-gray-600 disabled:cursor-not-allowed"
             aria-label="Next track"
           >
-            <SkipForward className="w-4 h-4" fill="currentColor" />
+            <SkipForward className="w-4 h-4 sm:w-4 sm:h-4" fill="currentColor" />
           </button>
         </div>
 
-        {/* Volume control */}
-        <div className="flex items-center gap-2 group">
+        {/* Volume control - hidden on mobile, touch devices use hardware volume */}
+        <div className="hidden sm:flex items-center gap-2 group">
           <button
             onClick={() => onVolumeChange(volume === 0 ? 80 : 0)}
             className="p-1 text-gray-400 hover:text-white transition-colors"

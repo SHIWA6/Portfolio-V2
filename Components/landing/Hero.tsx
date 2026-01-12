@@ -45,11 +45,12 @@ export default function Hero() {
               <Skill />
             </section>
             
-            <section className="w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Sliding Images - Hidden on mobile for better performance and UX */}
+            <section className="hidden md:block w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
               <SlidingImages />
             </section>
             
-            <div className="w-full overflow-hidden border-t border-white/5 bg-black/20 backdrop-blur-sm">
+            <div className="w-full overflow-hidden border-t border-white/5 bg-black/40 md:bg-black/20 md:backdrop-blur-sm">
               <div className="max-w-7xl mx-auto">
                 <Contact />
               </div>

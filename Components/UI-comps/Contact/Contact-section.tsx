@@ -68,6 +68,15 @@ export default function ContactSection(): React.ReactElement {
   const prefersReducedMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState(true);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile for scroll performance
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -82,22 +91,25 @@ export default function ContactSection(): React.ReactElement {
       document.removeEventListener("visibilitychange", onVisibility);
   }, []);
 
+  // MOBILE: Disable scroll-linked transforms for 60fps scrolling
+  const shouldAnimate = !isMobile && !prefersReducedMotion && isVisible;
+
   const y: MotionValue<number> = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion || !isVisible ? [0, 0] : [-100, 0]
+    shouldAnimate ? [-100, 0] : [0, 0]
   );
 
   const rotate: MotionValue<number> = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion || !isVisible ? [0, 0] : [120, 90]
+    shouldAnimate ? [120, 90] : [90, 90]
   );
 
   const opacity: MotionValue<number> = useTransform(
     scrollYProgress,
     [0, 0.5, 1],
-    [0, 0.5, 1]
+    isMobile ? [1, 1, 1] : [0, 0.5, 1]
   );
 
   const scrollToTop = (): void => {
@@ -107,42 +119,44 @@ export default function ContactSection(): React.ReactElement {
   return (
     <motion.section
       ref={containerRef}
-      style={{ y }}
+      style={{ y: isMobile ? 0 : y }}
       className="relative min-h-screen bg-black overflow-hidden"
     >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/3 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
-      </div>
+      {/* Animated background elements - DISABLED on mobile for performance */}
+      {!isMobile && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/3 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
+        </div>
+      )}
 
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-[0.05]" />
+      {/* Grid pattern overlay - simplified on mobile */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] md:opacity-[0.05]" />
 
-      <div className="relative max-w-7xl mx-auto px-6 py-20 md:py-32">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-32">
         {/* Hero Section */}
         <motion.div
-          style={{ opacity }}
-          className="mb-20 md:mb-32"
+          style={{ opacity: isMobile ? 1 : opacity }}
+          className="mb-16 md:mb-32"
         >
-          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-12 mb-12">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-12 mb-8 md:mb-12">
             {/* Profile Image */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={isMobile ? false : { opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: isMobile ? 0 : 0.6 }}
               className="relative shrink-0"
             >
-              <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
+              <div className="relative w-28 h-28 md:w-40 md:h-40 lg:w-48 lg:h-48">
                 {/* Skeleton loader */}
                 {!imageLoaded && (
                   <div className="absolute inset-0 bg-linear-to-br from-gray-800 to-gray-900 rounded-full animate-pulse" />
                 )}
                 
                 {/* Image container with fixed aspect ratio */}
-                <div className="absolute inset-0 rounded-full overflow-hidden ring-4 ring-white/20 ring-offset-4 ring-offset-black">
+                <div className="absolute inset-0 rounded-full overflow-hidden ring-2 md:ring-4 ring-white/20 ring-offset-2 md:ring-offset-4 ring-offset-black">
                   <img
                     src="/images/reall.webp"
                     alt="Shiwa Pandey - Full Stack Developer"
@@ -150,94 +164,99 @@ export default function ContactSection(): React.ReactElement {
                     height={192}
                     loading="eager"
                     onLoad={() => setImageLoaded(true)}
-                    className={`w-full h-full object-cover grayscale transition-all duration-700 ${
-                      imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                    className={`w-full h-full object-cover grayscale transition-opacity duration-300 ${
+                      imageLoaded ? "opacity-100" : "opacity-0"
                     }`}
                   />
                 </div>
 
-                {/* Animated border glow */}
-                <motion.div
-                  className="absolute inset-0 rounded-full"
-                  animate={{
-                    boxShadow: [
-                      "0 0 20px rgba(255, 255, 255, 0.2)",
-                      "0 0 40px rgba(255, 255, 255, 0.3)",
-                      "0 0 20px rgba(255, 255, 255, 0.2)",
-                    ],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
+                {/* Animated border glow - DISABLED on mobile */}
+                {!isMobile && (
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    animate={{
+                      boxShadow: [
+                        "0 0 20px rgba(255, 255, 255, 0.2)",
+                        "0 0 40px rgba(255, 255, 255, 0.3)",
+                        "0 0 20px rgba(255, 255, 255, 0.2)",
+                      ],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                )}
               </div>
             </motion.div>
 
             {/* Title */}
             <div className="flex-1">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={isMobile ? false : { opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                transition={{ duration: isMobile ? 0 : 0.6, delay: isMobile ? 0 : 0.2 }}
               >
-                <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-tight mb-4">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-tight mb-3 md:mb-4">
                   Let&apos;s work
                   <br />
                   <span className="relative inline-block">
                     <span className="relative z-10">together</span>
                     <motion.span
-                      className="absolute bottom-2 left-0 w-full h-3 bg-white"
+                      className="absolute bottom-1 md:bottom-2 left-0 w-full h-2 md:h-3 bg-white"
                       initial={{ scaleX: 0 }}
                       whileInView={{ scaleX: 1 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.5 }}
+                      transition={{ duration: isMobile ? 0.3 : 0.8, delay: isMobile ? 0 : 0.5 }}
                       style={{ transformOrigin: "left" }}
                     />
                   </span>
                 </h2>
-                <p className="text-gray-400 text-lg md:text-xl max-w-2xl">
+                <p className="text-gray-400 text-base md:text-lg lg:text-xl max-w-2xl">
                   Have a project in mind? Let&apos;s create something amazing together.
                   I&apos;m always open to discussing new opportunities.
                 </p>
               </motion.div>
             </div>
 
-            {/* Animated Arrow */}
-            <motion.div
-              style={{ rotate }}
-              className="hidden lg:block"
-            >
-              <svg
-                width="80"
-                height="80"
-                viewBox="0 0 9 9"
-                fill="none"
-                className="text-white"
+            {/* Animated Arrow - desktop only */}
+            {!isMobile && (
+              <motion.div
+                style={{ rotate }}
+                className="hidden lg:block"
               >
-                <path
-                  d="M8 8.5C8.27614 8.5 8.5 8.27614 8.5 8L8.5 3.5C8.5 3.22386 8.27614 3 8 3C7.72386 3 7.5 3.22386 7.5 3.5V7.5H3.5C3.22386 7.5 3 7.72386 3 8C3 8.27614 3.22386 8.5 3.5 8.5L8 8.5ZM0.646447 1.35355L7.64645 8.35355L8.35355 7.64645L1.35355 0.646447L0.646447 1.35355Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </motion.div>
+                <svg
+                  width="80"
+                  height="80"
+                  viewBox="0 0 9 9"
+                  fill="none"
+                  className="text-white"
+                >
+                  <path
+                    d="M8 8.5C8.27614 8.5 8.5 8.27614 8.5 8L8.5 3.5C8.5 3.22386 8.27614 3 8 3C7.72386 3 7.5 3.22386 7.5 3.5V7.5H3.5C3.22386 7.5 3 7.72386 3 8C3 8.27614 3.22386 8.5 3.5 8.5L8 8.5ZM0.646447 1.35355L7.64645 8.35355L8.35355 7.64645L1.35355 0.646447L0.646447 1.35355Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </motion.div>
+            )}
           </div>
 
           {/* Contact Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMobile ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-wrap gap-4"
+            transition={{ duration: isMobile ? 0 : 0.6, delay: isMobile ? 0 : 0.4 }}
+            className="flex flex-wrap gap-3 md:gap-4"
           >
             {CONTACT_LINKS.map((link, index) => (
               <ContactButton
                 key={index}
                 link={link}
-                delay={index * 0.1}
+                delay={isMobile ? 0 : index * 0.1}
+                isMobile={isMobile}
               />
             ))}
           </motion.div>
@@ -245,21 +264,21 @@ export default function ContactSection(): React.ReactElement {
 
         {/* Footer Info */}
         <motion.div
-          style={{ opacity }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16"
+          style={{ opacity: isMobile ? 1 : opacity }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mb-12 md:mb-16"
         >
           {/* Version */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMobile ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="space-y-3"
+            transition={{ duration: isMobile ? 0 : 0.6, delay: isMobile ? 0 : 0.6 }}
+            className="space-y-2 md:space-y-3"
           >
             <h3 className="text-gray-500 text-sm uppercase tracking-wider font-semibold">
               Version
             </h3>
-            <p className="text-white text-xl font-medium">
+            <p className="text-white text-lg md:text-xl font-medium">
               2025 © SHIWA
             </p>
             <p className="text-gray-600 text-sm">
@@ -269,21 +288,22 @@ export default function ContactSection(): React.ReactElement {
 
           {/* Socials */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMobile ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="space-y-3"
+            transition={{ duration: isMobile ? 0 : 0.6, delay: isMobile ? 0 : 0.7 }}
+            className="space-y-2 md:space-y-3"
           >
-            <h3 className="text-gray-500 text-sm uppercase tracking-wider font-semibold mb-4">
+            <h3 className="text-gray-500 text-sm uppercase tracking-wider font-semibold mb-3 md:mb-4">
               Socials
             </h3>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2 md:gap-3">
               {SOCIAL_LINKS.map((social, index) => (
                 <SocialLink
                   key={index}
                   social={social}
-                  delay={index * 0.1}
+                  delay={isMobile ? 0 : index * 0.1}
+                  isMobile={isMobile}
                 />
               ))}
             </div>
@@ -291,32 +311,32 @@ export default function ContactSection(): React.ReactElement {
 
           {/* Quick Stats */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMobile ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="space-y-4"
+            transition={{ duration: isMobile ? 0 : 0.6, delay: isMobile ? 0 : 0.8 }}
+            className="space-y-3 md:space-y-4"
           >
-            <h3 className="text-gray-500 text-sm uppercase tracking-wider font-semibold mb-4">
+            <h3 className="text-gray-500 text-sm uppercase tracking-wider font-semibold mb-3 md:mb-4">
               Quick Stats
             </h3>
-            <div className="space-y-3">
-              <StatItem label="Projects Completed" value="25+" />
-              <StatItem label="Years Experience" value="3+" />
-              <StatItem label="Happy Clients" value="15+" />
+            <div className="space-y-2 md:space-y-3">
+              <StatItem label="Projects Completed" value="25+" isMobile={isMobile} />
+              <StatItem label="Years Experience" value="3+" isMobile={isMobile} />
+              <StatItem label="Happy Clients" value="15+" isMobile={isMobile} />
             </div>
           </motion.div>
         </motion.div>
 
         {/* Back to Top Button */}
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={isMobile ? false : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.9 }}
+          transition={{ duration: isMobile ? 0 : 0.6, delay: isMobile ? 0 : 0.9 }}
           className="flex justify-center"
         >
-          <BackToTopButton onClick={scrollToTop} />
+          <BackToTopButton onClick={scrollToTop} isMobile={isMobile} />
         </motion.div>
       </div>
 
@@ -337,10 +357,26 @@ export default function ContactSection(): React.ReactElement {
 interface ContactButtonProps {
   link: ContactLink;
   delay: number;
+  isMobile: boolean;
 }
 
-function ContactButton({ link, delay }: ContactButtonProps): React.ReactElement {
+function ContactButton({ link, delay, isMobile }: ContactButtonProps): React.ReactElement {
   const [isHovered, setIsHovered] = useState(false);
+
+  // MOBILE: Use simpler styles without heavy animations
+  if (isMobile) {
+    return (
+      <a
+        href={link.href}
+        target={link.href.startsWith("http") ? "_blank" : undefined}
+        rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+        className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 border border-white/20 rounded-full active:bg-white active:text-black transition-colors duration-150"
+      >
+        <span className="text-xl shrink-0">{link.icon}</span>
+        <span className="font-medium text-sm text-white">{link.label}</span>
+      </a>
+    );
+  }
 
   return (
     <motion.a
@@ -392,10 +428,26 @@ function ContactButton({ link, delay }: ContactButtonProps): React.ReactElement 
 interface SocialLinkProps {
   social: SocialLink;
   delay: number;
+  isMobile: boolean;
 }
 
-function SocialLink({ social, delay }: SocialLinkProps): React.ReactElement {
+function SocialLink({ social, delay, isMobile }: SocialLinkProps): React.ReactElement {
   const [isHovered, setIsHovered] = useState(false);
+
+  // MOBILE: Simple link without animations
+  if (isMobile) {
+    return (
+      <a
+        href={social.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 text-gray-400 active:text-white transition-colors duration-150"
+      >
+        <span className="text-xl">{social.icon}</span>
+        <span className="text-base font-medium">{social.name}</span>
+      </a>
+    );
+  }
 
   return (
     <motion.a
@@ -438,13 +490,15 @@ function SocialLink({ social, delay }: SocialLinkProps): React.ReactElement {
 interface StatItemProps {
   label: string;
   value: string;
+  isMobile: boolean;
 }
 
-function StatItem({ label, value }: StatItemProps): React.ReactElement {
+function StatItem({ label, value, isMobile }: StatItemProps): React.ReactElement {
+  // MOBILE: No backdrop-blur for performance
   return (
-    <div className="flex items-center justify-between p-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+    <div className={`flex items-center justify-between p-3 bg-white/10 border border-white/10 rounded-lg transition-colors duration-150 ${!isMobile ? 'backdrop-blur-sm hover:bg-white/15 hover:border-white/20' : ''}`}>
       <span className="text-gray-400 text-sm">{label}</span>
-      <span className="text-white font-bold text-lg">{value}</span>
+      <span className="text-white font-bold text-base md:text-lg">{value}</span>
     </div>
   );
 }
@@ -453,10 +507,26 @@ function StatItem({ label, value }: StatItemProps): React.ReactElement {
 
 interface BackToTopButtonProps {
   onClick: () => void;
+  isMobile: boolean;
 }
 
-function BackToTopButton({ onClick }: BackToTopButtonProps): React.ReactElement {
+function BackToTopButton({ onClick, isMobile }: BackToTopButtonProps): React.ReactElement {
   const [isHovered, setIsHovered] = useState(false);
+
+  // MOBILE: Simple button without heavy animations
+  if (isMobile) {
+    return (
+      <button
+        onClick={onClick}
+        className="px-8 py-4 bg-white rounded-full text-black font-bold text-base active:scale-95 transition-transform duration-150"
+      >
+        <span className="flex items-center gap-2">
+          <span>↑</span>
+          Back to Top
+        </span>
+      </button>
+    );
+  }
 
   return (
     <motion.button

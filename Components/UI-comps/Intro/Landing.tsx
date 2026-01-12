@@ -54,7 +54,7 @@ const IntroCard = () => {
         // 1. h-auto: Grows with content (crucial for mobile).
         // 2. pb-14: Reserves bottom space for absolute progress dots so they don't overlap text.
         // 3. pt-12 md:pt-8: Extra top padding on mobile to clear the TimeLocal absolute element.
-        className="relative w-full max-w-[90vw] md:max-w-4xl mx-auto bg-[#181818] backdrop-blur-xl border border-white/20 rounded-3xl p-6 pt-12 md:p-8 pb-14 shadow-2xl flex flex-col justify-between"
+        className="relative w-full max-w-[90vw] md:max-w-4xl mx-auto bg-[#181818] md:backdrop-blur-xl border border-white/20 rounded-3xl p-6 pt-12 md:p-8 pb-14 shadow-lg md:shadow-2xl flex flex-col justify-between"
       > 
         
         {/* --- Header Time (Absolute) --- */}
@@ -183,7 +183,7 @@ const IntroCard = () => {
         <div className={`relative w-full mt-8 md:mt-12 rounded-[1.25rem] ${getSpotlightClass('about')}`}>
             <motion.div
             whileHover={{ scale: 1.01 }}
-            className="relative z-10 p-5 md:p-6 rounded-[1.25rem] bg-slate-800/30 border-2 border-black/50 backdrop-blur-sm overflow-hidden"
+            className="relative z-10 p-5 md:p-6 rounded-[1.25rem] bg-slate-800/50 md:bg-slate-800/30 border-2 border-black/50 md:backdrop-blur-sm overflow-hidden"
             >
              {/* Background Glow */}
             <div className="absolute inset-0 z-0 rounded-[1.25rem]">
