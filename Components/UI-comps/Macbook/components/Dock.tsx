@@ -49,7 +49,7 @@ const Dock: React.FC<DockProps> = ({ apps, windows, onAppClick }) => {
   const iconInnerSize = isMobile ? 'w-5 h-5' : 'w-6 h-6';
 
   return (
-    <div className={`absolute left-1/2 transform -translate-x-1/2 z-40 ${isMobile ? 'bottom-6' : 'bottom-3'}`}>
+    <div className={`absolute left-1/2 transform -translate-x-1/2 z-40 ${isMobile ? 'bottom-10' : 'bottom-3'}`}>
       <div className="bg-white/20 backdrop-blur-xl rounded-2xl px-2 py-1.5 border border-white/30 shadow-2xl">
         {/* Fixed height container to prevent layout shift */}
         <div 
