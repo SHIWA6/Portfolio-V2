@@ -7,19 +7,27 @@ import styles from './Preloader.module.scss'
 
 export default function PreLoader() {
     const [show, setShow] = useState(true)
+    const [isMobile, setIsMobile] = useState(false)
     const words = ["Hello", "Bonjur", "नमस्ते", "Ciao", "Olà" , "やあ", "Hallå", "Guten tag", "Hallo"]
     const [index, setIndex] = useState(0)
     const [dimension, setDimension] = useState({ width: 0, height: 0 })
 
+    // Detect mobile for faster preloader
     useEffect(() => {
+        setIsMobile(window.innerWidth < 768);
+    }, []);
+
+    useEffect(() => {
+       // MOBILE: 1s preloader (was 2s) - critical for LCP
+       const duration = isMobile ? 1000 : 2000;
        const timeout = setTimeout( () => {
             setShow(false);
             document.body.style.cursor = 'default'
             window.scrollTo(0,0);
-          }, 2000)
+          }, duration)
 
           return () => clearTimeout(timeout)
-    }, [])
+    }, [isMobile])
     
     useEffect(() => {
         if(index == words.length - 1) return;
@@ -92,9 +100,12 @@ const slideUp: Variants = {
                         <motion.p variants={opacity} initial="initial" animate="enter">
                             <span></span>{words[index]}
                         </motion.p>
-                        <svg>
-                            <motion.path variants={curve} initial="initial" exit="exit"></motion.path>
-                        </svg>
+                        {/* MOBILE: Skip expensive SVG curve animation for faster LCP */}
+                        {!isMobile && (
+                            <svg>
+                                <motion.path variants={curve} initial="initial" exit="exit"></motion.path>
+                            </svg>
+                        )}
                     </>
                     }
                 </motion.div>

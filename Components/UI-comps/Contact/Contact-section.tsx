@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
+import Image from "next/image";
 import {
   motion,
   useScroll,
@@ -157,12 +158,12 @@ export default function ContactSection(): React.ReactElement {
                 
                 {/* Image container with fixed aspect ratio */}
                 <div className="absolute inset-0 rounded-full overflow-hidden ring-2 md:ring-4 ring-white/20 ring-offset-2 md:ring-offset-4 ring-offset-black">
-                  <img
+                  <Image
                     src="/images/reall.webp"
                     alt="Shiwa Pandey - Full Stack Developer"
                     width={192}
                     height={192}
-                    loading="eager"
+                    priority
                     onLoad={() => setImageLoaded(true)}
                     className={`w-full h-full object-cover grayscale transition-opacity duration-300 ${
                       imageLoaded ? "opacity-100" : "opacity-0"

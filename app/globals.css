@@ -52,32 +52,46 @@ body {
     overscroll-behavior-x: none;
   }
   
-  /* Disable expensive effects on mobile during scroll */
+  /* CRITICAL: Disable ALL backdrop-blur on mobile for LCP/Speed Index */
   .backdrop-blur-sm,
   .backdrop-blur,
   .backdrop-blur-md,
   .backdrop-blur-lg,
   .backdrop-blur-xl,
   .backdrop-blur-2xl,
-  .backdrop-blur-3xl {
+  .backdrop-blur-3xl,
+  [class*="backdrop-blur"] {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
   
-  /* Reduce shadow complexity on mobile */
-  .shadow-2xl {
+  /* Reduce shadow complexity on mobile - improves paint times */
+  .shadow-2xl,
+  .shadow-xl {
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
   }
   
-  /* Force GPU compositing for smoother scroll */
-  .will-change-transform {
-    will-change: auto;
-    transform: translateZ(0);
+  /* Disable GPU-heavy filters on mobile */
+  .blur-xl,
+  .blur-2xl,
+  .blur-3xl {
+    filter: none !important;
   }
   
-  /* Disable animations during scroll for performance */
+  /* CRITICAL: Reduce motion for mobile - improves Speed Index */
   * {
     scroll-behavior: auto !important;
+  }
+  
+  /* Optimize transforms - only use GPU when necessary */
+  .will-change-transform {
+    will-change: auto;
+  }
+  
+  /* Simplify gradients on mobile */
+  .bg-gradient-to-r,
+  .bg-gradient-to-br {
+    background-size: 100% 100%;
   }
 }
 
@@ -123,8 +137,29 @@ body.macos-active {
 .scroll-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* Utility for hiding on ultra-small mobile */
 .usm\:hidden {
     @media (width <= 32rem /* 768px */) {
         display: none;
     }
+}
+
+/* ============================================================================
+   MOBILE LCP OPTIMIZATION: Reduce initial render complexity
+   ============================================================================ */
+@media (max-width: 767px) {
+  /* Hide non-critical elements during initial paint */
+  .mobile-defer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+  
+  /* Reduce animation complexity */
+  @media (prefers-reduced-motion: no-preference) {
+    .motion-reduce-mobile {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 }
