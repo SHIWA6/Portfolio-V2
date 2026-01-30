@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import images from "next/image";
 
 import { Toaster } from "../Components/ui/sonner";
 
@@ -21,6 +22,9 @@ export const metadata: Metadata = {
   title: "Shiva(a)",
   description: "Software Engineer Portfolio - Full-stack developer specializing in React, Next.js, and modern web technologies",
   metadataBase: new URL('https://pulsetalk.vercel.app'),
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 // MOBILE PERFORMANCE: Viewport configuration

@@ -13,9 +13,11 @@ export default function PreLoader() {
     const [dimension, setDimension] = useState({ width: 0, height: 0 })
 
     // Detect mobile for faster preloader
-    useEffect(() => {
-        setIsMobile(window.innerWidth < 768);
-    }, []);
+        useEffect(() => {
+            setTimeout(() => {
+                setIsMobile(window.innerWidth < 768);
+            }, 0);
+        }, []);
 
     useEffect(() => {
        // MOBILE: 1s preloader (was 2s) - critical for LCP

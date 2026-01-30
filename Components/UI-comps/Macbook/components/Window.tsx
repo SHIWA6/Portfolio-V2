@@ -29,7 +29,9 @@ const Window: React.FC<WindowProps> = ({
   useEffect(() => {
     if (windowIdRef.current !== windowState.id) {
       windowIdRef.current = windowState.id;
-      setIsOpening(true);
+      setTimeout(() => {
+        setIsOpening(true);
+      }, 0);
     }
   }, [windowState.id]);
 

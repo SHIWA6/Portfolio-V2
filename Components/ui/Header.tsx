@@ -9,9 +9,11 @@ const Header = () => {
   const pathname = usePathname()
   const [isMobile, setIsMobile] = useState(false)
   
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
-  }, [])
+    useEffect(() => {
+      setTimeout(() => {
+        setIsMobile(window.innerWidth < 768)
+      }, 0)
+    }, [])
   
   const activeItem = useMemo(() => {
     if (pathname === '/') return 'home'

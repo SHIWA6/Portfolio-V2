@@ -47,6 +47,14 @@ const projects: ReadonlyArray<ProjectItem> = [
     link: "https://pulse-talk-l9dd.vercel.app/",
     techStack: ["NextJs", "TailwindCss", "TypeScript", "ExpressJS", "Socket.io", "Redis"],
   },
+  { title: "EDGE-AI",
+  description: "A voice assistant powered by AI, created with NEXT.js and the Gemini API, offering 98% precision in speech recognition and a response time of only 1.5 seconds."
+  , src: "/images/Screenshot 2025-09-28 150550.webp",
+  color: "#000000",
+  link: "https://edge-ai-rho.vercel.app/",
+  techStack: ["NextJs, TailwindCss, NodeJS, ExpressJS, GeminiAPI"]
+
+ },
   {
     title: "Stakelytics",
     description:

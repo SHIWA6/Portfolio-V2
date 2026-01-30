@@ -1,0 +1,577 @@
+// archival-card.module.scss
+// ------------------------------------------------------------------
+// God Tier Design System
+// ------------------------------------------------------------------
+
+// Typography: Geometric Sans + Monospace pairing
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+// ------------------------------------------------------------------
+// Variables (Golden Ratio Scale)
+// ------------------------------------------------------------------
+$space-xs: 0.5rem;   // 8px
+$space-sm: 0.809rem; // 13px (φ)
+$space-md: 1.309rem; // 21px (φ²)
+$space-lg: 2.118rem; // 34px (φ³)
+$space-xl: 3.427rem; // 55px (φ⁴)
+
+$carbon: #0a0a0a;
+$graphite: #111111;
+$anthracite: #161616;
+$platinum: #e5e5e5;
+$nickel: #a3a3a3;
+$gunmetal: #404040;
+$silver: #d4d4d4;
+
+// ------------------------------------------------------------------
+// Container
+// ------------------------------------------------------------------
+.container {
+  min-height: 100vh;
+  width: 100%;
+  background-color: $carbon;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-lg;
+  position: relative;
+  overflow: hidden;
+  
+  // Base texture
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.02) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 40%);
+}
+
+// Ambient lighting layer
+// Uses CSS custom properties for GPU-composited updates (no React re-render)
+.ambientLight {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+  // Use CSS custom properties for cursor position (GPU-composited)
+  background: radial-gradient(
+    circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+    rgba(255,255,255,0.03) 0%,
+    transparent 50%
+  );
+  // Hardware acceleration for smooth updates
+  transform: translateZ(0);
+  will-change: background;
+}
+
+// Film grain overlay for tactile surface
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+// ------------------------------------------------------------------
+// The Card (Primary Artifact)
+// ------------------------------------------------------------------
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  z-index: 10;
+  
+  // Multiple shadow layers for depth (z-axis separation)
+  box-shadow: 
+    0 1px 1px rgba(0,0,0,0.5),
+    0 2px 2px rgba(0,0,0,0.4),
+    0 4px 4px rgba(0,0,0,0.3),
+    0 8px 8px rgba(0,0,0,0.2),
+    0 16px 16px rgba(0,0,0,0.1);
+}
+
+// Mat border creates "frame within frame" depth
+.matBorder {
+  background-color: $anthracite;
+  padding: 2px; // Hairline border
+  border-radius: 4px; // Machined, not organic
+  
+  // Inner shadow for pressed effect
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.surface {
+  background-color: $graphite;
+  border-radius: 2px;
+  padding: $space-xl;
+  position: relative;
+  
+  @media (max-width: 768px) {
+    padding: $space-md;
+  }
+}
+
+// ------------------------------------------------------------------
+// Grid Architecture (Asymmetric)
+// ------------------------------------------------------------------
+.grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: $space-xl;
+  align-items: start;
+  
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+    gap: $space-lg;
+  }
+}
+
+// Mobile variant: Always single column (rendered only on pointer: coarse devices)
+.gridMobile {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-lg;
+  align-items: start;
+}
+
+// ------------------------------------------------------------------
+// Visual Column (Left)
+// ------------------------------------------------------------------
+.visualColumn {
+  position: relative;
+}
+
+.imageContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+// Matting effect - like a museum photograph
+.imageMat {
+  background-color: $carbon;
+  padding: $space-xs;
+  border-radius: 2px;
+  box-shadow: 
+    inset 0 0 0 1px rgba(255,255,255,0.05),
+    0 20px 40px -20px rgba(0,0,0,0.8);
+}
+
+.imageFrame {
+  position: relative;
+  overflow: hidden;
+  background-color: $carbon;
+  aspect-ratio: 1/1;
+  
+  // Subtle inner shadow for depth
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    pointer-events: none;
+  }
+}
+
+.portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(20%) contrast(1.1); // Archival photo treatment
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  
+  &:hover {
+    transform: scale(1.03);
+  }
+}
+
+// Technical metadata
+.imageCaption {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: $gunmetal;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0 $space-xs;
+}
+
+// ------------------------------------------------------------------
+// Content Column (Right)
+// ------------------------------------------------------------------
+.contentColumn {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+  padding-top: $space-sm;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  color: $nickel;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.index {
+  color: $silver;
+  font-weight: 500;
+}
+
+.divider {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, $gunmetal 0%, transparent 100%);
+  opacity: 0.5;
+}
+
+.status {
+  color: #6b8b6b; // Muted sage green (understated "active" indicator)
+  position: relative;
+  padding-left: $space-md;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: currentColor;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+  }
+}
+
+.name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 300; // Light weight for elegance
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: $platinum;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nameAccent {
+  font-weight: 500;
+  color: $silver;
+}
+
+// Kinetic Text - Word-level animation for performance
+// Uses CSS animations instead of Framer Motion for simpler fades
+.kineticText {
+  display: block;
+}
+
+// Individual word wrapper for animation
+.kineticWord {
+  display: inline-block;
+  will-change: opacity, transform;
+  // Contain layout to prevent CLS
+  contain: layout style;
+}
+
+// Keyframe animation for fade-in-up effect
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.5em, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+// Respect reduced motion preference
+@media (prefers-reduced-motion: reduce) {
+  .kineticWord {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+.role {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 300;
+  color: $nickel;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+// ------------------------------------------------------------------
+// Contact Block
+// ------------------------------------------------------------------
+.contactBlock {
+  margin-top: $space-md;
+}
+
+.contactLabel {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: $gunmetal;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: $space-sm;
+}
+
+.emailLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  color: $platinum;
+  text-decoration: none;
+  padding: $space-sm $space-md;
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+  
+  &:hover::before {
+    transform: translateX(100%);
+  }
+  
+  &:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: $silver;
+  }
+}
+
+.linkIcon {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+  
+  .emailLink:hover & {
+    transform: translate(2px, -2px);
+    opacity: 1;
+  }
+}
+
+// ------------------------------------------------------------------
+// Social Grid
+// ------------------------------------------------------------------
+.socialBlock {
+  margin-top: $space-sm;
+}
+
+.socialGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-sm;
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Mobile variant: Single column for larger touch targets
+.socialGridMobile {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-sm;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  background-color: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 2px;
+  text-decoration: none;
+  color: $nickel;
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    color: $platinum;
+    background-color: rgba(255,255,255,0.03);
+    transform: translateY(-1px);
+    
+    &::after {
+      opacity: 1;
+    }
+  }
+}
+
+.socialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.socialLabel {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+// ------------------------------------------------------------------
+// Statement Section (Pull Quote)
+// ------------------------------------------------------------------
+.statementSection {
+  margin-top: $space-xl;
+  position: relative;
+}
+
+.statementBorder {
+  position: relative;
+  padding: $space-lg;
+  border-left: 2px solid rgba(255,255,255,0.1);
+  background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+}
+
+.statement {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  font-weight: 300;
+  line-height: 1.6;
+  color: $nickel;
+  margin: 0;
+  max-width: 65ch; // Optimal reading width
+  
+  &::before {
+    content: '"';
+    position: absolute;
+    top: $space-md;
+    left: $space-md;
+    font-size: 4rem;
+    color: rgba(255,255,255,0.05);
+    font-family: serif;
+    line-height: 1;
+    pointer-events: none;
+  }
+}
+
+// ------------------------------------------------------------------
+// Corner Details (Invisible Craftsmanship)
+// ------------------------------------------------------------------
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  opacity: 0.3;
+  
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    background-color: $silver;
+  }
+  
+  &::before { width: 1px; height: 100%; }
+  &::after { width: 100%; height: 1px; }
+}
+
+.cornerTL { top: -10px; left: -10px; }
+.cornerTR { top: -10px; right: -10px; transform: rotate(90deg); }
+.cornerBL { bottom: -10px; left: -10px; transform: rotate(-90deg); }
+.cornerBR { bottom: -10px; right: -10px; transform: rotate(180deg); }
+
+// ------------------------------------------------------------------
+// Magnetic Button Base
+// ------------------------------------------------------------------
+.magneticButton {
+  display: inline-flex;
+  cursor: pointer;
+  will-change: transform;
+  
+  // Keyboard navigation focus indicator
+  &:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.5);
+    outline-offset: 2px;
+  }
+}
+
+// ------------------------------------------------------------------
+// Accessibility: Focus Visible States
+// ------------------------------------------------------------------
+.emailLink,
+.socialLink {
+  &:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.5);
+    outline-offset: 2px;
+    border-color: rgba(255,255,255,0.3);
+  }
+}
+
+// ------------------------------------------------------------------
+// Respect Reduced Motion Globally
+// ------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .portrait {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+  }
+  
+  .emailLink::before {
+    transition: none;
+    transform: none;
+  }
+  
+  .socialLink {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+    
+    &::after {
+      transition: none;
+    }
+  }
+  
+  .linkIcon {
+    transition: none;
+  }
+}
