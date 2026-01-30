@@ -1,39 +1,4 @@
-/**
- * ============================================================================
- * ARCHIVAL INTRO CARD - MOBILE VARIANT
- * ============================================================================
- *
- * Editorial, museum-grade experience for touch devices (pointer: coarse).
- *
- * DESIGN PHILOSOPHY:
- * Mobile is not "desktop shrunk" — it's a different reading experience.
- * The archival identity is preserved through spacing, contrast, and material
- * texture, not through scale. Content flows vertically in a calm, composed
- * hierarchy that respects the small screen.
- *
- * MOBILE-SPECIFIC DECISIONS:
- * - Image as identity seal: Small, centered, unobtrusive (not a hero banner)
- * - Email as metadata: No CTA styling, reads as contact info
- * - Reduced typography scale: Dense but readable, no oversized headings
- * - Tightened spacing: Editorial compactness without cramping
- * - Centered alignment: Composed, not "landing page fluff"
- * - Single entrance animation: One-time fade-up, no continuous motion
- *
- * WHAT'S REMOVED FROM DESKTOP:
- * - Cursor tracking (no cursor on touch)
- * - Magnetic buttons (no hover state)
- * - Continuous ambient animations
- * - Asymmetric grid layout
- * - Large typography scale
- * - Statement border/quote styling (simplified)
- *
- * PERFORMANCE:
- * - Minimal DOM depth
- * - CSS-only transitions
- * - GPU-friendly transforms
- * - No JS animation loops
- * ============================================================================
- */
+
 
 "use client";
 
@@ -53,14 +18,7 @@ interface MobileCardProps {
   socials: SocialLink[];
 }
 
-// =============================================================================
-// STATIC LINK COMPONENT
-// =============================================================================
 
-/**
- * StaticLink - Touch-optimized anchor without magnetic effects.
- * Simple, immediate tap feedback via CSS :active state.
- */
 const StaticLink = memo(function StaticLink({
   children,
   href,
