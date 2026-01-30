@@ -3,37 +3,35 @@
  * ARCHIVAL INTRO CARD - MOBILE VARIANT
  * ============================================================================
  *
- * Static, depth-first experience for touch devices (pointer: coarse).
+ * Editorial, museum-grade experience for touch devices (pointer: coarse).
  *
  * DESIGN PHILOSOPHY:
- * Mobile doesn't mean "cut down" - it means "different priorities." Instead of
- * motion-based delight, we use static depth (layers, shadows, contrast) to
- * achieve the same archival museum-grade aesthetic.
+ * Mobile is not "desktop shrunk" — it's a different reading experience.
+ * The archival identity is preserved through spacing, contrast, and material
+ * texture, not through scale. Content flows vertically in a calm, composed
+ * hierarchy that respects the small screen.
  *
- * WHAT'S DIFFERENT FROM DESKTOP:
- * - NO cursor tracking: No cursor exists on touch devices
- * - NO magnetic buttons: No hover state to trigger attraction
- * - NO continuous animations: Battery preservation, instant feel
- * - NO staggered reveals: Single entrance or fully static
- * - Touch-friendly hit targets (44px minimum)
- * - Simplified DOM for faster parsing
+ * MOBILE-SPECIFIC DECISIONS:
+ * - Image as identity seal: Small, centered, unobtrusive (not a hero banner)
+ * - Email as metadata: No CTA styling, reads as contact info
+ * - Reduced typography scale: Dense but readable, no oversized headings
+ * - Tightened spacing: Editorial compactness without cramping
+ * - Centered alignment: Composed, not "landing page fluff"
+ * - Single entrance animation: One-time fade-up, no continuous motion
  *
- * WHAT'S PRESERVED:
- * - Archival color palette and typography
- * - Layered depth through shadows and borders
- * - Grain overlay for material realism
- * - All content and information hierarchy
- * - Corner craftsmanship details
+ * WHAT'S REMOVED FROM DESKTOP:
+ * - Cursor tracking (no cursor on touch)
+ * - Magnetic buttons (no hover state)
+ * - Continuous ambient animations
+ * - Asymmetric grid layout
+ * - Large typography scale
+ * - Statement border/quote styling (simplified)
  *
- * ANIMATION RATIONALE:
- * Only one-time entrance animation (or none if reduced motion). This provides
- * orientation without continuous battery drain or cognitive load.
- *
- * PERFORMANCE PRIORITIES:
- * - Minimal DOM (simpler than desktop)
- * - No JS-driven animations
- * - CSS-only transitions (instant feedback)
- * - GPU-friendly static layers
+ * PERFORMANCE:
+ * - Minimal DOM depth
+ * - CSS-only transitions
+ * - GPU-friendly transforms
+ * - No JS animation loops
  * ============================================================================
  */
 
@@ -56,17 +54,12 @@ interface MobileCardProps {
 }
 
 // =============================================================================
-// STATIC COMPONENTS (No motion, immediate render)
+// STATIC LINK COMPONENT
 // =============================================================================
 
 /**
- * Static Link - Touch-optimized anchor without magnetic effects.
- *
- * MOBILE OPTIMIZATION:
- * - No mousemove listeners (touch doesn't have continuous position)
- * - No RAF loops (saves battery)
- * - CSS :active state for instant tap feedback
- * - 44px minimum touch target (accessibility)
+ * StaticLink - Touch-optimized anchor without magnetic effects.
+ * Simple, immediate tap feedback via CSS :active state.
  */
 const StaticLink = memo(function StaticLink({
   children,
@@ -90,108 +83,106 @@ const StaticLink = memo(function StaticLink({
 });
 
 // =============================================================================
-// CONTENT RENDERER (Shared between static and animated)
+// SHARED CONTENT STRUCTURE
 // =============================================================================
 
 /**
- * CardContent - Shared content structure for both static and animated versions.
- * This ensures content parity while allowing different wrappers for animation.
+ * CardContent - Vertical hierarchy: image → identity → contact → socials
+ * Designed for mobile-first reading flow with reduced visual weight.
  */
 function CardContent({ socials }: { socials: SocialLink[] }) {
   return (
     <main className={styles.card}>
       <div className={styles.matBorder}>
-        <div className={styles.surface}>
-          <div className={styles.gridMobile}>
+        <div className={`${styles.surface} ${styles.surfaceMobile}`}>
+          
+          {/* IDENTITY SECTION: Centered, compact */}
+          <section className={styles.identitySection}>
             
-            {/* TOP: Visual Anchor */}
-            <div className={styles.visualColumn}>
-              <div className={styles.imageContainer}>
-                <div className={styles.imageMat}>
-                  <div className={styles.imageFrame}>
-                    <Image
-                      src="/images/reall.webp"
-                      alt="Shiva Pandey - Software Engineer"
-                      width={400}
-                      height={400}
-                      priority
-                      className={styles.portrait}
-                      sizes="100vw"
-                    />
-                  </div>
-                </div>
-                
-                <div className={styles.imageCaption}>
-                  <span className={styles.captionId}>ID: SHIWA.2024</span>
-                  <span className={styles.captionSpec}>Type: Full Stack</span>
+            {/* Image: Identity seal, not hero */}
+            <div className={styles.identityVisual}>
+              <div className={styles.imageMatMobile}>
+                <div className={styles.imageFrameMobile}>
+                  <Image
+                    src="/images/reall.webp"
+                    alt="Shiva Pandey"
+                    width={120}
+                    height={120}
+                    priority
+                    className={styles.portraitMobile}
+                    sizes="120px"
+                  />
                 </div>
               </div>
-            </div>
-
-            {/* BOTTOM: Information Architecture */}
-            <div className={styles.contentColumn}>
               
-              <header className={styles.header}>
-                <div className={styles.metaRow}>
-                  <span className={styles.index}>01</span>
-                  <div className={styles.divider} />
-                  <span className={styles.status}>Available for collaboration</span>
-                </div>
-
-                <h1 className={styles.name}>
-                  <span>Shiva</span>
-                  <span className={styles.nameAccent}>Pandey</span>
-                </h1>
-
-                <p className={styles.role}>
-                  Software Engineer & Architect
-                </p>
-              </header>
-
-              <div className={styles.contactBlock}>
-                <div className={styles.contactLabel}>Contact</div>
-                <StaticLink 
-                  href="mailto:Shivapanday9616527173@gmail.com"
-                  className={styles.emailLink}
-                >
-                  <span>Shivapanday9616527173@gmail.com</span>
-                  <FaArrowUpRightFromSquare className={styles.linkIcon} aria-hidden />
-                </StaticLink>
+              {/* Technical metadata - minimal */}
+              <div className={styles.imageCaptionMobile}>
+                <span>SHIWA.2024</span>
+                <span className={styles.captionDivider}>·</span>
+                <span>Full Stack</span>
               </div>
-
-              <div className={styles.socialBlock}>
-                <div className={styles.contactLabel}>Connect</div>
-                <div className={styles.socialGridMobile} role="list">
-                  {socials.map((social) => (
-                    <StaticLink 
-                      key={social.id} 
-                      href={social.href}
-                      className={styles.socialLink}
-                    >
-                      <span className={styles.socialIcon}>{social.icon}</span>
-                      <span className={styles.socialLabel}>{social.label}</span>
-                    </StaticLink>
-                  ))}
-                </div>
-              </div>
-
             </div>
-          </div>
 
-          <div className={styles.statementSection}>
-            <div className={styles.statementBorder}>
-              <p className={styles.statement}>
-                Building full-stack applications with design-first philosophy. 
-                Focused on production-ready systems, seamless user experiences, 
-                and architectural elegance. Preparing for GATE2027.
+            {/* Name and Role */}
+            <header className={styles.identityHeader}>
+              <div className={styles.metaRowMobile}>
+                <span className={styles.statusIndicator} />
+                <span className={styles.statusText}>Available</span>
+              </div>
+
+              <h1 className={styles.nameMobile}>
+                <span>Shiva</span>
+                <span className={styles.nameAccentMobile}>Pandey</span>
+              </h1>
+
+              <p className={styles.roleMobile}>
+                Software Engineer & Architect
               </p>
+            </header>
+
+          </section>
+
+          {/* CONTACT SECTION: Email as metadata */}
+          <section className={styles.contactSectionMobile}>
+            <div className={styles.sectionLabelMobile}>Contact</div>
+            <StaticLink 
+              href="mailto:Shivapanday9616527173@gmail.com"
+              className={styles.emailLinkMobile}
+            >
+              <span>Shivapanday9616527173@gmail.com</span>
+              <FaArrowUpRightFromSquare className={styles.linkIconMobile} aria-hidden />
+            </StaticLink>
+          </section>
+
+          {/* SOCIALS SECTION: Compact grid */}
+          <section className={styles.socialsSectionMobile}>
+            <div className={styles.sectionLabelMobile}>Connect</div>
+            <div className={styles.socialGridCompact} role="list">
+              {socials.map((social) => (
+                <StaticLink 
+                  key={social.id} 
+                  href={social.href}
+                  className={styles.socialLinkCompact}
+                >
+                  <span className={styles.socialIconCompact}>{social.icon}</span>
+                  <span className={styles.socialLabelCompact}>{social.label}</span>
+                </StaticLink>
+              ))}
             </div>
-          </div>
+          </section>
+
+          {/* STATEMENT: Simplified, no heavy border */}
+          <section className={styles.statementSectionMobile}>
+            <p className={styles.statementMobile}>
+              Building full-stack applications with design-first philosophy. 
+              Focused on production-ready systems and architectural elegance.
+            </p>
+          </section>
 
         </div>
       </div>
 
-      {/* Corner Details */}
+      {/* Corner Details - Subtle craftsmanship */}
       <div className={`${styles.corner} ${styles.cornerTL}`} aria-hidden />
       <div className={`${styles.corner} ${styles.cornerTR}`} aria-hidden />
       <div className={`${styles.corner} ${styles.cornerBL}`} aria-hidden />
@@ -201,7 +192,7 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
 }
 
 // =============================================================================
-// STATIC VERSION (No animations)
+// STATIC VERSION (No animations, for reduced motion)
 // =============================================================================
 
 function StaticMobileCard({ socials }: MobileCardProps) {
@@ -214,157 +205,141 @@ function StaticMobileCard({ socials }: MobileCardProps) {
 }
 
 // =============================================================================
-// ANIMATED VERSION (One-time entrance)
+// ANIMATED VERSION (One-time entrance only)
 // =============================================================================
 
-const cardVariants: Variants = {
-  hidden: { 
-    opacity: 0, 
-    y: 20 
-  },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1],
-    }
-  },
-};
-
-const staggerContainer: Variants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      duration: 0.5,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.08,
       delayChildren: 0.1,
     },
   },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { 
-    opacity: 1, 
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.4, 0, 0.2, 1],
-    }
+      ease: [0.22, 1, 0.36, 1],
+    },
   },
 };
 
 function AnimatedMobileCard({ socials }: MobileCardProps) {
   return (
     <div className={styles.container}>
-      <motion.main 
+      <motion.div
         className={styles.card}
         initial="hidden"
         animate="visible"
-        variants={cardVariants}
+        variants={containerVariants}
       >
         <div className={styles.matBorder}>
-          <div className={styles.surface}>
-            <motion.div 
-              className={styles.gridMobile}
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
+          <motion.div 
+            className={`${styles.surface} ${styles.surfaceMobile}`}
+            variants={itemVariants}
+          >
+            
+            {/* IDENTITY SECTION */}
+            <section className={styles.identitySection}>
               
-              {/* TOP: Visual Anchor */}
-              <motion.div className={styles.visualColumn} variants={itemVariants}>
-                <div className={styles.imageContainer}>
-                  <div className={styles.imageMat}>
-                    <div className={styles.imageFrame}>
-                      <Image
-                        src="/images/reall.webp"
-                        alt="Shiva Pandey - Software Engineer"
-                        width={400}
-                        height={400}
-                        priority
-                        className={styles.portrait}
-                        sizes="100vw"
-                      />
-                    </div>
+              {/* Image: Identity seal */}
+              <motion.div className={styles.identityVisual} variants={itemVariants}>
+                <div className={styles.imageMatMobile}>
+                  <div className={styles.imageFrameMobile}>
+                    <Image
+                      src="/images/reall.webp"
+                      alt="Shiva Pandey"
+                      width={120}
+                      height={120}
+                      priority
+                      className={styles.portraitMobile}
+                      sizes="120px"
+                    />
                   </div>
-                  
-                  <div className={styles.imageCaption}>
-                    <span className={styles.captionId}>ID: SHIWA.2024</span>
-                    <span className={styles.captionSpec}>Type: Full Stack</span>
-                  </div>
+                </div>
+                
+                <div className={styles.imageCaptionMobile}>
+                  <span>SHIWA.2024</span>
+                  <span className={styles.captionDivider}>·</span>
+                  <span>Full Stack</span>
                 </div>
               </motion.div>
 
-              {/* BOTTOM: Information Architecture */}
-              <div className={styles.contentColumn}>
-                
-                <header className={styles.header}>
-                  <motion.div className={styles.metaRow} variants={itemVariants}>
-                    <span className={styles.index}>01</span>
-                    <div className={styles.divider} />
-                    <span className={styles.status}>Available for collaboration</span>
-                  </motion.div>
-
-                  <motion.div variants={itemVariants}>
-                    <h1 className={styles.name}>
-                      <span>Shiva</span>
-                      <span className={styles.nameAccent}>Pandey</span>
-                    </h1>
-                  </motion.div>
-
-                  <motion.div variants={itemVariants}>
-                    <p className={styles.role}>
-                      Software Engineer & Architect
-                    </p>
-                  </motion.div>
-                </header>
-
-                <motion.div className={styles.contactBlock} variants={itemVariants}>
-                  <div className={styles.contactLabel}>Contact</div>
-                  <StaticLink 
-                    href="mailto:Shivapanday9616527173@gmail.com"
-                    className={styles.emailLink}
-                  >
-                    <span>Shivapanday9616527173@gmail.com</span>
-                    <FaArrowUpRightFromSquare className={styles.linkIcon} aria-hidden />
-                  </StaticLink>
+              {/* Name and Role */}
+              <header className={styles.identityHeader}>
+                <motion.div className={styles.metaRowMobile} variants={itemVariants}>
+                  <span className={styles.statusIndicator} />
+                  <span className={styles.statusText}>Available</span>
                 </motion.div>
 
-                <motion.div className={styles.socialBlock} variants={itemVariants}>
-                  <div className={styles.contactLabel}>Connect</div>
-                  <div className={styles.socialGridMobile} role="list">
-                    {socials.map((social) => (
-                      <StaticLink 
-                        key={social.id} 
-                        href={social.href}
-                        className={styles.socialLink}
-                      >
-                        <span className={styles.socialIcon}>{social.icon}</span>
-                        <span className={styles.socialLabel}>{social.label}</span>
-                      </StaticLink>
-                    ))}
-                  </div>
-                </motion.div>
+                <motion.h1 className={styles.nameMobile} variants={itemVariants}>
+                  <span>Shiva</span>
+                  <span className={styles.nameAccentMobile}>Pandey</span>
+                </motion.h1>
 
-              </div>
-            </motion.div>
+                <motion.p className={styles.roleMobile} variants={itemVariants}>
+                  Software Engineer & Architect
+                </motion.p>
+              </header>
 
-            <motion.div 
-              className={styles.statementSection}
+            </section>
+
+            {/* CONTACT SECTION */}
+            <motion.section 
+              className={styles.contactSectionMobile} 
               variants={itemVariants}
             >
-              <div className={styles.statementBorder}>
-                <p className={styles.statement}>
-                  Building full-stack applications with design-first philosophy. 
-                  Focused on production-ready systems, seamless user experiences, 
-                  and architectural elegance. Preparing for GATE2027.
-                </p>
-              </div>
-            </motion.div>
+              <div className={styles.sectionLabelMobile}>Contact</div>
+              <StaticLink 
+                href="mailto:Shivapanday9616527173@gmail.com"
+                className={styles.emailLinkMobile}
+              >
+                <span>Shivapanday9616527173@gmail.com</span>
+                <FaArrowUpRightFromSquare className={styles.linkIconMobile} aria-hidden />
+              </StaticLink>
+            </motion.section>
 
-          </div>
+            {/* SOCIALS SECTION */}
+            <motion.section 
+              className={styles.socialsSectionMobile} 
+              variants={itemVariants}
+            >
+              <div className={styles.sectionLabelMobile}>Connect</div>
+              <div className={styles.socialGridCompact} role="list">
+                {socials.map((social) => (
+                  <StaticLink 
+                    key={social.id} 
+                    href={social.href}
+                    className={styles.socialLinkCompact}
+                  >
+                    <span className={styles.socialIconCompact}>{social.icon}</span>
+                    <span className={styles.socialLabelCompact}>{social.label}</span>
+                  </StaticLink>
+                ))}
+              </div>
+            </motion.section>
+
+            {/* STATEMENT */}
+            <motion.section 
+              className={styles.statementSectionMobile} 
+              variants={itemVariants}
+            >
+              <p className={styles.statementMobile}>
+                Building full-stack applications with design-first philosophy. 
+                Focused on production-ready systems and architectural elegance.
+              </p>
+            </motion.section>
+
+          </motion.div>
         </div>
 
         {/* Corner Details */}
@@ -372,9 +347,8 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
         <div className={`${styles.corner} ${styles.cornerTR}`} aria-hidden />
         <div className={`${styles.corner} ${styles.cornerBL}`} aria-hidden />
         <div className={`${styles.corner} ${styles.cornerBR}`} aria-hidden />
-      </motion.main>
+      </motion.div>
 
-      {/* Grain Overlay */}
       <div className={styles.grain} aria-hidden />
     </div>
   );
@@ -385,9 +359,10 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
 // =============================================================================
 
 /**
- * ArchivalIntroCardMobile - Touch-optimized static experience.
+ * ArchivalIntroCardMobile - Touch-optimized, editorial mobile experience.
  *
  * Renders either static or animated version based on reduced motion preference.
+ * Animation is one-time entrance only — no continuous effects.
  */
 export default function ArchivalIntroCardMobile({ socials }: MobileCardProps) {
   const prefersReducedMotion = useReducedMotion();
