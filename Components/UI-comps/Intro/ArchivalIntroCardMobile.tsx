@@ -1,8 +1,6 @@
-
-
 "use client";
 
-import React, { memo } from 'react';
+import React, { memo, useState, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion, Variants } from 'framer-motion';
 
@@ -17,6 +15,60 @@ interface MobileCardProps {
   socials: SocialLink[];
 }
 
+// =============================================================================
+// TOUCH GLOW HOOK - Interaction-based glow (off by default)
+// =============================================================================
+
+function useTouchGlow() {
+  const [isActive, setIsActive] = useState(false);
+  const [position, setPosition] = useState({ x: 50, y: 50 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (rect) {
+      const x = ((touch.clientX - rect.left) / rect.width) * 100;
+      const y = ((touch.clientY - rect.top) / rect.height) * 100;
+      setPosition({ x, y });
+    }
+    setIsActive(true);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsActive(false);
+  }, []);
+
+  const handleMouseEnter = useCallback((e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (rect) {
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setPosition({ x, y });
+    }
+    setIsActive(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsActive(false);
+  }, []);
+
+  return {
+    containerRef,
+    isActive,
+    position,
+    handlers: {
+      onTouchStart: handleTouchStart,
+      onTouchEnd: handleTouchEnd,
+      onMouseEnter: handleMouseEnter,
+      onMouseLeave: handleMouseLeave,
+    },
+  };
+}
+
+// =============================================================================
+// STATIC LINK COMPONENT
+// =============================================================================
 
 const StaticLink = memo(function StaticLink({
   children,
@@ -40,42 +92,60 @@ const StaticLink = memo(function StaticLink({
 });
 
 // =============================================================================
-// SHARED CONTENT STRUCTURE
+// CARD CONTENT - Optimized for 390×844 first-fold
 // =============================================================================
 
 /**
- * CardContent - Vertical hierarchy: image → identity → contact → socials
- * Designed for mobile-first reading flow with reduced visual weight.
+ * CardContent - Mobile-first identity card
+ * 
+ * Viewport discipline (390×844):
+ * - Total content height: ~466px
+ * - Identity visible within first 525px
+ * - Image: 72px (reduced dominance via size + vignette)
+ * - Typography: Increased weight for hierarchy shift
  */
 function CardContent({ socials }: { socials: SocialLink[] }) {
+  const { containerRef, isActive, position, handlers } = useTouchGlow();
+
   return (
-    <main className={styles.card}>
+    <main 
+      className={`${styles.card} ${styles.cardMobile}`}
+      ref={containerRef}
+      {...handlers}
+      style={{
+        '--touch-x': `${position.x}%`,
+        '--touch-y': `${position.y}%`,
+      } as React.CSSProperties}
+    >
+      {/* Interaction glow - off by default, on touch/hover only */}
+      <div 
+        className={`${styles.interactionGlow} ${isActive ? styles.active : ''}`}
+        aria-hidden
+      />
+      
       <div className={styles.matBorder}>
         <div className={`${styles.surface} ${styles.surfaceMobile}`}>
           
-          {/* IDENTITY SECTION: Name + role as single typographic unit */}
+          {/* IDENTITY SECTION: Image supports identity, doesn't dominate */}
           <section className={styles.identitySection}>
             
-            {/* Image: Circular identity seal (88px) */}
+            {/* Image: 72px identity seal with vignette */}
             <div className={styles.identityVisual}>
               <div className={styles.imageFrameMobile}>
                 <Image
                   src="/images/reall.webp"
                   alt="Shiva Pandey"
-                  width={88}
-                  height={88}
+                  width={72}
+                  height={72}
                   priority
                   className={styles.portraitMobile}
-                  sizes="88px"
+                  sizes="72px"
                 />
               </div>
-              {/* REMOVED: imageCaptionMobile - technical metadata competes with identity */}
             </div>
 
-            {/* Name and Role: Bonded typographic unit */}
+            {/* Name and Role: Typography gains visual weight */}
             <header className={styles.identityHeader}>
-              {/* REMOVED: metaRowMobile with status indicator - visual noise on small screens */}
-
               <h1 className={styles.nameMobile}>
                 <span>Shiva</span>
                 <span className={styles.nameAccentMobile}>Pandey</span>
@@ -88,21 +158,18 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
 
           </section>
 
-          {/* CONTACT SECTION: Quiet metadata, not CTA */}
+          {/* CONTACT: Quiet metadata */}
           <section className={styles.contactSectionMobile}>
-            {/* REMOVED: sectionLabelMobile - reduces visual hierarchy */}
             <StaticLink
               href="mailto:Shivapanday9616527173@gmail.com"
               className={styles.emailLinkMobile}
             >
               Shivapanday9616527173@gmail.com
-              {/* REMOVED: linkIconMobile - icon competes with metadata styling */}
             </StaticLink>
           </section>
 
-          {/* SOCIALS SECTION: Single column minimal pills */}
+          {/* SOCIALS: Single column compact */}
           <section className={styles.socialsSectionMobile}>
-            {/* REMOVED: sectionLabelMobile - reduced visual noise */}
             <div className={styles.socialGridCompact} role="list">
               {socials.map((social) => (
                 <StaticLink
@@ -117,7 +184,7 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
             </div>
           </section>
 
-          {/* STATEMENT: Footnote treatment at bottom */}
+          {/* STATEMENT: Footnote at bottom */}
           <section className={styles.statementSectionMobile}>
             <p className={styles.statementMobile}>
               Building full-stack applications with design-first philosophy.
@@ -128,11 +195,7 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
         </div>
       </div>
 
-      {/* Corner Details - Subtle craftsmanship */}
-      <div className={`${styles.corner} ${styles.cornerTL}`} aria-hidden />
-      <div className={`${styles.corner} ${styles.cornerTR}`} aria-hidden />
-      <div className={`${styles.corner} ${styles.cornerBL}`} aria-hidden />
-      <div className={`${styles.corner} ${styles.cornerBR}`} aria-hidden />
+      {/* REMOVED: Corner details - visual noise on small screens */}
     </main>
   );
 }
@@ -143,9 +206,9 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
 
 function StaticMobileCard({ socials }: MobileCardProps) {
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${styles.containerMobile}`}>
       <CardContent socials={socials} />
-      <div className={styles.grain} aria-hidden />
+      {/* REMOVED: grain overlay - visual noise on mobile */}
     </div>
   );
 }
@@ -159,64 +222,78 @@ const containerVariants: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      duration: 0.5,
+      duration: 0.4,
       ease: [0.22, 1, 0.36, 1],
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
+      staggerChildren: 0.06,
+      delayChildren: 0.05,
     },
   },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 12 },
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.4,
+      duration: 0.35,
       ease: [0.22, 1, 0.36, 1],
     },
   },
 };
 
 function AnimatedMobileCard({ socials }: MobileCardProps) {
+  const { containerRef, isActive, position, handlers } = useTouchGlow();
+
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${styles.containerMobile}`}>
       <motion.div
-        className={styles.card}
+        className={`${styles.card} ${styles.cardMobile}`}
+        ref={containerRef}
+        {...handlers}
+        style={{
+          '--touch-x': `${position.x}%`,
+          '--touch-y': `${position.y}%`,
+        } as React.CSSProperties}
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
+        {/* Interaction glow - off by default, on interaction only */}
+        <motion.div 
+          className={`${styles.interactionGlow} ${isActive ? styles.active : ''}`}
+          aria-hidden
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isActive ? 1 : 0 }}
+          transition={{ duration: 0.2 }}
+        />
+        
         <div className={styles.matBorder}>
           <motion.div 
             className={`${styles.surface} ${styles.surfaceMobile}`}
             variants={itemVariants}
           >
             
-            {/* IDENTITY SECTION: Name + role as single typographic unit */}
+            {/* IDENTITY SECTION */}
             <section className={styles.identitySection}>
               
-              {/* Image: Circular identity seal (88px) */}
+              {/* Image: 72px with vignette, object-position focus */}
               <motion.div className={styles.identityVisual} variants={itemVariants}>
                 <div className={styles.imageFrameMobile}>
                   <Image
                     src="/images/reall.webp"
                     alt="Shiva Pandey"
-                    width={88}
-                    height={88}
+                    width={72}
+                    height={72}
                     priority
                     className={styles.portraitMobile}
-                    sizes="88px"
+                    sizes="72px"
                   />
                 </div>
-                {/* REMOVED: imageCaptionMobile - technical metadata competes with identity */}
               </motion.div>
 
-              {/* Name and Role: Bonded typographic unit */}
+              {/* Name and Role: Increased weight */}
               <header className={styles.identityHeader}>
-                {/* REMOVED: metaRowMobile with status indicator - visual noise on small screens */}
-
                 <motion.h1 className={styles.nameMobile} variants={itemVariants}>
                   <span>Shiva</span>
                   <span className={styles.nameAccentMobile}>Pandey</span>
@@ -229,27 +306,24 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
 
             </section>
 
-            {/* CONTACT SECTION: Quiet metadata, not CTA */}
-            <motion.section
-              className={styles.contactSectionMobile}
+            {/* CONTACT */}
+            <motion.section 
+              className={styles.contactSectionMobile} 
               variants={itemVariants}
             >
-              {/* REMOVED: sectionLabelMobile - reduces visual hierarchy */}
               <StaticLink
                 href="mailto:Shivapanday9616527173@gmail.com"
                 className={styles.emailLinkMobile}
               >
                 Shivapanday9616527173@gmail.com
-                {/* REMOVED: linkIconMobile - icon competes with metadata styling */}
               </StaticLink>
             </motion.section>
 
-            {/* SOCIALS SECTION: Single column minimal pills */}
-            <motion.section
-              className={styles.socialsSectionMobile}
+            {/* SOCIALS */}
+            <motion.section 
+              className={styles.socialsSectionMobile} 
               variants={itemVariants}
             >
-              {/* REMOVED: sectionLabelMobile - reduced visual noise */}
               <div className={styles.socialGridCompact} role="list">
                 {socials.map((social) => (
                   <StaticLink
@@ -270,7 +344,7 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
               variants={itemVariants}
             >
               <p className={styles.statementMobile}>
-                Building full-stack applications with design-first philosophy. 
+                Building full-stack applications with design-first philosophy.
                 Focused on production-ready systems and architectural elegance.
               </p>
             </motion.section>
@@ -278,14 +352,10 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
           </motion.div>
         </div>
 
-        {/* Corner Details */}
-        <div className={`${styles.corner} ${styles.cornerTL}`} aria-hidden />
-        <div className={`${styles.corner} ${styles.cornerTR}`} aria-hidden />
-        <div className={`${styles.corner} ${styles.cornerBL}`} aria-hidden />
-        <div className={`${styles.corner} ${styles.cornerBR}`} aria-hidden />
+        {/* REMOVED: Corner details - visual noise on mobile */}
       </motion.div>
 
-      <div className={styles.grain} aria-hidden />
+      {/* REMOVED: grain overlay - reduces visual noise */}
     </div>
   );
 }
@@ -295,10 +365,14 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
 // =============================================================================
 
 /**
- * ArchivalIntroCardMobile - Touch-optimized, editorial mobile experience.
- *
- * Renders either static or animated version based on reduced motion preference.
- * Animation is one-time entrance only — no continuous effects.
+ * ArchivalIntroCardMobile - Touch-optimized for 390×844
+ * 
+ * First-fold discipline:
+ * - Identity visible without scrolling
+ * - Image: 72px (supports, doesn't dominate)
+ * - Typography: Increased weight for hierarchy
+ * - Glow: Off by default, on interaction only
+ * - Grain: Disabled on mobile
  */
 export default function ArchivalIntroCardMobile({ socials }: MobileCardProps) {
   const prefersReducedMotion = useReducedMotion();
