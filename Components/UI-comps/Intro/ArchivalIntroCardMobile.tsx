@@ -5,7 +5,6 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion, Variants } from 'framer-motion';
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 import { SocialLink } from './shared/design-system';
 import styles from './archival-card.module.scss';
@@ -54,39 +53,28 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
       <div className={styles.matBorder}>
         <div className={`${styles.surface} ${styles.surfaceMobile}`}>
           
-          {/* IDENTITY SECTION: Centered, compact */}
+          {/* IDENTITY SECTION: Name + role as single typographic unit */}
           <section className={styles.identitySection}>
             
-            {/* Image: Identity seal, not hero */}
+            {/* Image: Circular identity seal (88px) */}
             <div className={styles.identityVisual}>
-              <div className={styles.imageMatMobile}>
-                <div className={styles.imageFrameMobile}>
-                  <Image
-                    src="/images/reall.webp"
-                    alt="Shiva Pandey"
-                    width={120}
-                    height={120}
-                    priority
-                    className={styles.portraitMobile}
-                    sizes="120px"
-                  />
-                </div>
+              <div className={styles.imageFrameMobile}>
+                <Image
+                  src="/images/reall.webp"
+                  alt="Shiva Pandey"
+                  width={88}
+                  height={88}
+                  priority
+                  className={styles.portraitMobile}
+                  sizes="88px"
+                />
               </div>
-              
-              {/* Technical metadata - minimal */}
-              <div className={styles.imageCaptionMobile}>
-                <span>SHIWA.2024</span>
-                <span className={styles.captionDivider}>·</span>
-                <span>Full Stack</span>
-              </div>
+              {/* REMOVED: imageCaptionMobile - technical metadata competes with identity */}
             </div>
 
-            {/* Name and Role */}
+            {/* Name and Role: Bonded typographic unit */}
             <header className={styles.identityHeader}>
-              <div className={styles.metaRowMobile}>
-                <span className={styles.statusIndicator} />
-                <span className={styles.statusText}>Available</span>
-              </div>
+              {/* REMOVED: metaRowMobile with status indicator - visual noise on small screens */}
 
               <h1 className={styles.nameMobile}>
                 <span>Shiva</span>
@@ -100,25 +88,25 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
 
           </section>
 
-          {/* CONTACT SECTION: Email as metadata */}
+          {/* CONTACT SECTION: Quiet metadata, not CTA */}
           <section className={styles.contactSectionMobile}>
-            <div className={styles.sectionLabelMobile}>Contact</div>
-            <StaticLink 
+            {/* REMOVED: sectionLabelMobile - reduces visual hierarchy */}
+            <StaticLink
               href="mailto:Shivapanday9616527173@gmail.com"
               className={styles.emailLinkMobile}
             >
-              <span>Shivapanday9616527173@gmail.com</span>
-              <FaArrowUpRightFromSquare className={styles.linkIconMobile} aria-hidden />
+              Shivapanday9616527173@gmail.com
+              {/* REMOVED: linkIconMobile - icon competes with metadata styling */}
             </StaticLink>
           </section>
 
-          {/* SOCIALS SECTION: Compact grid */}
+          {/* SOCIALS SECTION: Single column minimal pills */}
           <section className={styles.socialsSectionMobile}>
-            <div className={styles.sectionLabelMobile}>Connect</div>
+            {/* REMOVED: sectionLabelMobile - reduced visual noise */}
             <div className={styles.socialGridCompact} role="list">
               {socials.map((social) => (
-                <StaticLink 
-                  key={social.id} 
+                <StaticLink
+                  key={social.id}
                   href={social.href}
                   className={styles.socialLinkCompact}
                 >
@@ -129,10 +117,10 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
             </div>
           </section>
 
-          {/* STATEMENT: Simplified, no heavy border */}
+          {/* STATEMENT: Footnote treatment at bottom */}
           <section className={styles.statementSectionMobile}>
             <p className={styles.statementMobile}>
-              Building full-stack applications with design-first philosophy. 
+              Building full-stack applications with design-first philosophy.
               Focused on production-ready systems and architectural elegance.
             </p>
           </section>
@@ -206,38 +194,28 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
             variants={itemVariants}
           >
             
-            {/* IDENTITY SECTION */}
+            {/* IDENTITY SECTION: Name + role as single typographic unit */}
             <section className={styles.identitySection}>
               
-              {/* Image: Identity seal */}
+              {/* Image: Circular identity seal (88px) */}
               <motion.div className={styles.identityVisual} variants={itemVariants}>
-                <div className={styles.imageMatMobile}>
-                  <div className={styles.imageFrameMobile}>
-                    <Image
-                      src="/images/reall.webp"
-                      alt="Shiva Pandey"
-                      width={120}
-                      height={120}
-                      priority
-                      className={styles.portraitMobile}
-                      sizes="120px"
-                    />
-                  </div>
+                <div className={styles.imageFrameMobile}>
+                  <Image
+                    src="/images/reall.webp"
+                    alt="Shiva Pandey"
+                    width={88}
+                    height={88}
+                    priority
+                    className={styles.portraitMobile}
+                    sizes="88px"
+                  />
                 </div>
-                
-                <div className={styles.imageCaptionMobile}>
-                  <span>SHIWA.2024</span>
-                  <span className={styles.captionDivider}>·</span>
-                  <span>Full Stack</span>
-                </div>
+                {/* REMOVED: imageCaptionMobile - technical metadata competes with identity */}
               </motion.div>
 
-              {/* Name and Role */}
+              {/* Name and Role: Bonded typographic unit */}
               <header className={styles.identityHeader}>
-                <motion.div className={styles.metaRowMobile} variants={itemVariants}>
-                  <span className={styles.statusIndicator} />
-                  <span className={styles.statusText}>Available</span>
-                </motion.div>
+                {/* REMOVED: metaRowMobile with status indicator - visual noise on small screens */}
 
                 <motion.h1 className={styles.nameMobile} variants={itemVariants}>
                   <span>Shiva</span>
@@ -251,31 +229,31 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
 
             </section>
 
-            {/* CONTACT SECTION */}
-            <motion.section 
-              className={styles.contactSectionMobile} 
+            {/* CONTACT SECTION: Quiet metadata, not CTA */}
+            <motion.section
+              className={styles.contactSectionMobile}
               variants={itemVariants}
             >
-              <div className={styles.sectionLabelMobile}>Contact</div>
-              <StaticLink 
+              {/* REMOVED: sectionLabelMobile - reduces visual hierarchy */}
+              <StaticLink
                 href="mailto:Shivapanday9616527173@gmail.com"
                 className={styles.emailLinkMobile}
               >
-                <span>Shivapanday9616527173@gmail.com</span>
-                <FaArrowUpRightFromSquare className={styles.linkIconMobile} aria-hidden />
+                Shivapanday9616527173@gmail.com
+                {/* REMOVED: linkIconMobile - icon competes with metadata styling */}
               </StaticLink>
             </motion.section>
 
-            {/* SOCIALS SECTION */}
-            <motion.section 
-              className={styles.socialsSectionMobile} 
+            {/* SOCIALS SECTION: Single column minimal pills */}
+            <motion.section
+              className={styles.socialsSectionMobile}
               variants={itemVariants}
             >
-              <div className={styles.sectionLabelMobile}>Connect</div>
+              {/* REMOVED: sectionLabelMobile - reduced visual noise */}
               <div className={styles.socialGridCompact} role="list">
                 {socials.map((social) => (
-                  <StaticLink 
-                    key={social.id} 
+                  <StaticLink
+                    key={social.id}
                     href={social.href}
                     className={styles.socialLinkCompact}
                   >
