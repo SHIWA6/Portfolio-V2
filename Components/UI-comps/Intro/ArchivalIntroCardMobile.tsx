@@ -96,13 +96,20 @@ const StaticLink = memo(function StaticLink({
 // =============================================================================
 
 /**
- * CardContent - Mobile-first identity card
+ * CardContent - Mobile-first IDENTITY CARD (not a poster)
  * 
  * Viewport discipline (390×844):
- * - Total content height: ~466px
- * - Identity visible within first 525px
- * - Image: 72px (reduced dominance via size + vignette)
- * - Typography: Increased weight for hierarchy shift
+ * - Safe area: ~59px top, ~34px bottom → usable: 751px
+ * - First fold target: 70% → ~525px
+ * - Actual content height: ~380px ✓
+ * 
+ * Reading order (strict hierarchy):
+ * 1. Image (64px - identity seal, not hero)
+ * 2. Name (primary)
+ * 3. Role (secondary)
+ * 4. Status (availability)
+ * 5. Email (metadata)
+ * 6. Socials (grouped unit)
  */
 function CardContent({ socials }: { socials: SocialLink[] }) {
   const { containerRef, isActive, position, handlers } = useTouchGlow();
@@ -117,85 +124,78 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
         '--touch-y': `${position.y}%`,
       } as React.CSSProperties}
     >
-      {/* Interaction glow - off by default, on touch/hover only */}
+      {/* Interaction glow - off by default, on tap only */}
       <div 
         className={`${styles.interactionGlow} ${isActive ? styles.active : ''}`}
         aria-hidden
       />
       
-      <div className={styles.matBorder}>
+      <div className={styles.matBorderMobile}>
         <div className={`${styles.surface} ${styles.surfaceMobile}`}>
           
-          {/* IDENTITY SECTION: Image supports identity, doesn't dominate */}
-          <section className={styles.identitySection}>
+          {/* ====== IDENTITY UNIT ====== */}
+          {/* Image + Name + Role + Status = ONE cohesive block */}
+          <section className={styles.identityUnit}>
             
-            {/* Image: 72px identity seal with vignette */}
-            <div className={styles.identityVisual}>
-              <div className={styles.imageFrameMobile}>
-                <Image
-                  src="/images/reall.webp"
-                  alt="Shiva Pandey"
-                  width={72}
-                  height={72}
-                  priority
-                  className={styles.portraitMobile}
-                  sizes="72px"
-                />
-              </div>
+            {/* Image: 64px seal - supports identity, doesn't dominate */}
+            <div className={styles.identitySeal}>
+              <Image
+                src="/images/reall.webp"
+                alt="Shiva Pandey"
+                width={64}
+                height={64}
+                priority
+                className={styles.portraitMobile}
+                sizes="64px"
+              />
             </div>
 
-            {/* Name and Role: Typography gains visual weight */}
-            <header className={styles.identityHeader}>
-              <h1 className={styles.nameMobile}>
-                <span>Shiva</span>
-                <span className={styles.nameAccentMobile}>Pandey</span>
-              </h1>
+            {/* Name: Primary focus */}
+            <h1 className={styles.nameMobile}>
+              <span>Shiva</span>
+              <span className={styles.nameAccentMobile}>Pandey</span>
+            </h1>
 
-              <p className={styles.roleMobile}>
-                Software Engineer & Architect
-              </p>
-            </header>
+            {/* Role: Secondary */}
+            <p className={styles.roleMobile}>
+              Software Engineer & Architect
+            </p>
+
+            {/* Status: Availability tied to identity */}
+            <div className={styles.statusBadge}>
+              <span className={styles.statusDot} aria-hidden />
+              <span>Available for collaboration</span>
+            </div>
 
           </section>
 
-          {/* CONTACT: Quiet metadata */}
-          <section className={styles.contactSectionMobile}>
+          {/* ====== CONTACT METADATA ====== */}
+          <section className={styles.contactMeta}>
             <StaticLink
               href="mailto:Shivapanday9616527173@gmail.com"
-              className={styles.emailLinkMobile}
+              className={styles.emailMeta}
             >
               Shivapanday9616527173@gmail.com
             </StaticLink>
           </section>
 
-          {/* SOCIALS: Single column compact */}
-          <section className={styles.socialsSectionMobile}>
-            <div className={styles.socialGridCompact} role="list">
+          {/* ====== SOCIAL LINKS (grouped unit) ====== */}
+          <nav className={styles.socialUnit} aria-label="Social links">
+            <div className={styles.socialRow} role="list">
               {socials.map((social) => (
                 <StaticLink
                   key={social.id}
                   href={social.href}
-                  className={styles.socialLinkCompact}
+                  className={styles.socialChip}
                 >
-                  <span className={styles.socialIconCompact}>{social.icon}</span>
-                  <span className={styles.socialLabelCompact}>{social.label}</span>
+                  <span className={styles.socialChipIcon}>{social.icon}</span>
                 </StaticLink>
               ))}
             </div>
-          </section>
-
-          {/* STATEMENT: Footnote at bottom */}
-          <section className={styles.statementSectionMobile}>
-            <p className={styles.statementMobile}>
-              Building full-stack applications with design-first philosophy.
-              Focused on production-ready systems and architectural elegance.
-            </p>
-          </section>
+          </nav>
 
         </div>
       </div>
-
-      {/* REMOVED: Corner details - visual noise on small screens */}
     </main>
   );
 }
@@ -208,7 +208,6 @@ function StaticMobileCard({ socials }: MobileCardProps) {
   return (
     <div className={`${styles.container} ${styles.containerMobile}`}>
       <CardContent socials={socials} />
-      {/* REMOVED: grain overlay - visual noise on mobile */}
     </div>
   );
 }
@@ -259,7 +258,7 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
         animate="visible"
         variants={containerVariants}
       >
-        {/* Interaction glow - off by default, on interaction only */}
+        {/* Interaction glow - off by default, on tap only */}
         <motion.div 
           className={`${styles.interactionGlow} ${isActive ? styles.active : ''}`}
           aria-hidden
@@ -268,94 +267,79 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
           transition={{ duration: 0.2 }}
         />
         
-        <div className={styles.matBorder}>
+        <div className={styles.matBorderMobile}>
           <motion.div 
             className={`${styles.surface} ${styles.surfaceMobile}`}
             variants={itemVariants}
           >
             
-            {/* IDENTITY SECTION */}
-            <section className={styles.identitySection}>
+            {/* ====== IDENTITY UNIT ====== */}
+            <section className={styles.identityUnit}>
               
-              {/* Image: 72px with vignette, object-position focus */}
-              <motion.div className={styles.identityVisual} variants={itemVariants}>
-                <div className={styles.imageFrameMobile}>
-                  <Image
-                    src="/images/reall.webp"
-                    alt="Shiva Pandey"
-                    width={72}
-                    height={72}
-                    priority
-                    className={styles.portraitMobile}
-                    sizes="72px"
-                  />
-                </div>
+              {/* Image: 64px seal */}
+              <motion.div className={styles.identitySeal} variants={itemVariants}>
+                <Image
+                  src="/images/reall.webp"
+                  alt="Shiva Pandey"
+                  width={64}
+                  height={64}
+                  priority
+                  className={styles.portraitMobile}
+                  sizes="64px"
+                />
               </motion.div>
 
-              {/* Name and Role: Increased weight */}
-              <header className={styles.identityHeader}>
-                <motion.h1 className={styles.nameMobile} variants={itemVariants}>
-                  <span>Shiva</span>
-                  <span className={styles.nameAccentMobile}>Pandey</span>
-                </motion.h1>
+              {/* Name */}
+              <motion.h1 className={styles.nameMobile} variants={itemVariants}>
+                <span>Shiva</span>
+                <span className={styles.nameAccentMobile}>Pandey</span>
+              </motion.h1>
 
-                <motion.p className={styles.roleMobile} variants={itemVariants}>
-                  Software Engineer & Architect
-                </motion.p>
-              </header>
+              {/* Role */}
+              <motion.p className={styles.roleMobile} variants={itemVariants}>
+                Software Engineer & Architect
+              </motion.p>
+
+              {/* Status */}
+              <motion.div className={styles.statusBadge} variants={itemVariants}>
+                <span className={styles.statusDot} aria-hidden />
+                <span>Available for collaboration</span>
+              </motion.div>
 
             </section>
 
-            {/* CONTACT */}
-            <motion.section 
-              className={styles.contactSectionMobile} 
-              variants={itemVariants}
-            >
+            {/* ====== CONTACT METADATA ====== */}
+            <motion.section className={styles.contactMeta} variants={itemVariants}>
               <StaticLink
                 href="mailto:Shivapanday9616527173@gmail.com"
-                className={styles.emailLinkMobile}
+                className={styles.emailMeta}
               >
                 Shivapanday9616527173@gmail.com
               </StaticLink>
             </motion.section>
 
-            {/* SOCIALS */}
-            <motion.section 
-              className={styles.socialsSectionMobile} 
+            {/* ====== SOCIAL LINKS ====== */}
+            <motion.nav 
+              className={styles.socialUnit} 
+              aria-label="Social links"
               variants={itemVariants}
             >
-              <div className={styles.socialGridCompact} role="list">
+              <div className={styles.socialRow} role="list">
                 {socials.map((social) => (
                   <StaticLink
                     key={social.id}
                     href={social.href}
-                    className={styles.socialLinkCompact}
+                    className={styles.socialChip}
                   >
-                    <span className={styles.socialIconCompact}>{social.icon}</span>
-                    <span className={styles.socialLabelCompact}>{social.label}</span>
+                    <span className={styles.socialChipIcon}>{social.icon}</span>
                   </StaticLink>
                 ))}
               </div>
-            </motion.section>
-
-            {/* STATEMENT */}
-            <motion.section 
-              className={styles.statementSectionMobile} 
-              variants={itemVariants}
-            >
-              <p className={styles.statementMobile}>
-                Building full-stack applications with design-first philosophy.
-                Focused on production-ready systems and architectural elegance.
-              </p>
-            </motion.section>
+            </motion.nav>
 
           </motion.div>
         </div>
-
-        {/* REMOVED: Corner details - visual noise on mobile */}
       </motion.div>
-
-      {/* REMOVED: grain overlay - reduces visual noise */}
     </div>
   );
 }
@@ -365,14 +349,28 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
 // =============================================================================
 
 /**
- * ArchivalIntroCardMobile - Touch-optimized for 390×844
+ * ArchivalIntroCardMobile - Identity Card optimized for 390×844
  * 
- * First-fold discipline:
- * - Identity visible without scrolling
- * - Image: 72px (supports, doesn't dominate)
- * - Typography: Increased weight for hierarchy
- * - Glow: Off by default, on interaction only
- * - Grain: Disabled on mobile
+ * Philosophy: IDENTITY CARD, not a poster
+ * 
+ * First-fold guarantee (no scroll required):
+ * - Image: 64px identity seal (supports, doesn't dominate)
+ * - Name: Primary focus (increased weight)
+ * - Role: Secondary
+ * - Status: "Available for collaboration"
+ * - Email: Quiet metadata
+ * - Socials: Icon-only horizontal row
+ * 
+ * Viewport math:
+ * - 390×844 usable: ~751px (minus safe areas)
+ * - Content height: ~320px (well within first fold)
+ * 
+ * Visual discipline:
+ * - Single shadow layer (no stacked shadows)
+ * - Glow: OFF by default, ON only on tap
+ * - No grain overlay
+ * - No decorative corners
+ * - Flat-but-premium aesthetic
  */
 export default function ArchivalIntroCardMobile({ socials }: MobileCardProps) {
   const prefersReducedMotion = useReducedMotion();
