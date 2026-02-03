@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useState, useCallback, useRef } from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion, Variants } from 'framer-motion';
 
@@ -13,57 +13,6 @@ import styles from './archival-card.module.scss';
 
 interface MobileCardProps {
   socials: SocialLink[];
-}
-
-// =============================================================================
-// TOUCH GLOW HOOK - Interaction-based glow (off by default)
-// =============================================================================
-
-function useTouchGlow() {
-  const [isActive, setIsActive] = useState(false);
-  const [position, setPosition] = useState({ x: 50, y: 50 });
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (rect) {
-      const x = ((touch.clientX - rect.left) / rect.width) * 100;
-      const y = ((touch.clientY - rect.top) / rect.height) * 100;
-      setPosition({ x, y });
-    }
-    setIsActive(true);
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    setIsActive(false);
-  }, []);
-
-  const handleMouseEnter = useCallback((e: React.MouseEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (rect) {
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      setPosition({ x, y });
-    }
-    setIsActive(true);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsActive(false);
-  }, []);
-
-  return {
-    containerRef,
-    isActive,
-    position,
-    handlers: {
-      onTouchStart: handleTouchStart,
-      onTouchEnd: handleTouchEnd,
-      onMouseEnter: handleMouseEnter,
-      onMouseLeave: handleMouseLeave,
-    },
-  };
 }
 
 // =============================================================================
@@ -96,40 +45,21 @@ const StaticLink = memo(function StaticLink({
 // =============================================================================
 
 /**
- * CardContent - Mobile-first IDENTITY CARD (not a poster)
+ * CardContent - Mobile-first IDENTITY CARD
  * 
- * Viewport discipline (390×844):
- * - Safe area: ~59px top, ~34px bottom → usable: 751px
- * - First fold target: 70% → ~525px
- * - Actual content height: ~380px ✓
+ * Viewport: 390×844 first-fold optimized
  * 
  * Reading order (strict hierarchy):
- * 1. Image (64px - identity seal, not hero)
+ * 1. Image (44px - identity seal, NOT hero)
  * 2. Name (primary)
- * 3. Role (secondary)
+ * 3. Role (secondary, bonded to name)
  * 4. Status (availability)
- * 5. Email (metadata)
- * 6. Socials (grouped unit)
+ * 5. Email (quiet metadata)
+ * 6. Socials (utility pills)
  */
 function CardContent({ socials }: { socials: SocialLink[] }) {
-  const { containerRef, isActive, position, handlers } = useTouchGlow();
-
   return (
-    <main 
-      className={`${styles.card} ${styles.cardMobile}`}
-      ref={containerRef}
-      {...handlers}
-      style={{
-        '--touch-x': `${position.x}%`,
-        '--touch-y': `${position.y}%`,
-      } as React.CSSProperties}
-    >
-      {/* Interaction glow - off by default, on tap only */}
-      <div 
-        className={`${styles.interactionGlow} ${isActive ? styles.active : ''}`}
-        aria-hidden
-      />
-      
+    <main className={`${styles.card} ${styles.cardMobile}`}>
       <div className={styles.matBorderMobile}>
         <div className={`${styles.surface} ${styles.surfaceMobile}`}>
           
@@ -137,16 +67,16 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
           {/* Image + Name + Role + Status = ONE cohesive block */}
           <section className={styles.identityUnit}>
             
-            {/* Image: 64px seal - supports identity, doesn't dominate */}
+            {/* Image: 44px seal - supports identity, doesn't dominate */}
             <div className={styles.identitySeal}>
               <Image
                 src="/images/reall.webp"
                 alt="Shiva Pandey"
-                width={64}
-                height={64}
+                width={44}
+                height={44}
                 priority
                 className={styles.portraitMobile}
-                sizes="64px"
+                sizes="44px"
               />
             </div>
 
@@ -156,12 +86,12 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
               <span className={styles.nameAccentMobile}>Pandey</span>
             </h1>
 
-            {/* Role: Secondary */}
+            {/* Role: Secondary, tight coupling */}
             <p className={styles.roleMobile}>
               Software Engineer & Architect
             </p>
 
-            {/* Status: Availability tied to identity */}
+            {/* Status: Availability */}
             <div className={styles.statusBadge}>
               <span className={styles.statusDot} aria-hidden />
               <span>Available for collaboration</span>
@@ -179,7 +109,7 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
             </StaticLink>
           </section>
 
-          {/* ====== SOCIAL LINKS (grouped unit) ====== */}
+          {/* ====== SOCIAL LINKS (utility pills) ====== */}
           <nav className={styles.socialUnit} aria-label="Social links">
             <div className={styles.socialRow} role="list">
               {socials.map((social) => (
@@ -242,31 +172,14 @@ const itemVariants: Variants = {
 };
 
 function AnimatedMobileCard({ socials }: MobileCardProps) {
-  const { containerRef, isActive, position, handlers } = useTouchGlow();
-
   return (
     <div className={`${styles.container} ${styles.containerMobile}`}>
       <motion.div
         className={`${styles.card} ${styles.cardMobile}`}
-        ref={containerRef}
-        {...handlers}
-        style={{
-          '--touch-x': `${position.x}%`,
-          '--touch-y': `${position.y}%`,
-        } as React.CSSProperties}
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
-        {/* Interaction glow - off by default, on tap only */}
-        <motion.div 
-          className={`${styles.interactionGlow} ${isActive ? styles.active : ''}`}
-          aria-hidden
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isActive ? 1 : 0 }}
-          transition={{ duration: 0.2 }}
-        />
-        
         <div className={styles.matBorderMobile}>
           <motion.div 
             className={`${styles.surface} ${styles.surfaceMobile}`}
@@ -276,16 +189,16 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
             {/* ====== IDENTITY UNIT ====== */}
             <section className={styles.identityUnit}>
               
-              {/* Image: 64px seal */}
+              {/* Image: 44px seal */}
               <motion.div className={styles.identitySeal} variants={itemVariants}>
                 <Image
                   src="/images/reall.webp"
                   alt="Shiva Pandey"
-                  width={64}
-                  height={64}
+                  width={44}
+                  height={44}
                   priority
                   className={styles.portraitMobile}
-                  sizes="64px"
+                  sizes="44px"
                 />
               </motion.div>
 
@@ -349,28 +262,30 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
 // =============================================================================
 
 /**
- * ArchivalIntroCardMobile - Identity Card optimized for 390×844
+ * ArchivalIntroCardMobile - Editorial Identity Card for 390×844
  * 
- * Philosophy: IDENTITY CARD, not a poster
+ * Philosophy: CALM, EDITORIAL, INTENTIONAL
  * 
  * First-fold guarantee (no scroll required):
- * - Image: 64px identity seal (supports, doesn't dominate)
- * - Name: Primary focus (increased weight)
- * - Role: Secondary
+ * - Image: 44px identity seal (supports, doesn't dominate)
+ * - Name: Primary focus (tight line-height)
+ * - Role: Secondary (bonded to name with 2px gap)
  * - Status: "Available for collaboration"
- * - Email: Quiet metadata
- * - Socials: Icon-only horizontal row
+ * - Email: Quiet metadata (low opacity, no background)
+ * - Socials: Pill buttons (utility, not feature)
  * 
- * Viewport math:
- * - 390×844 usable: ~751px (minus safe areas)
- * - Content height: ~320px (well within first fold)
+ * What was removed:
+ * - Touch glow effect (hover metaphor doesn't translate)
+ * - Multiple shadow layers
+ * - Background states on email
+ * - Large circular social buttons
+ * - Golden ratio spacing
  * 
  * Visual discipline:
- * - Single shadow layer (no stacked shadows)
- * - Glow: OFF by default, ON only on tap
- * - No grain overlay
- * - No decorative corners
- * - Flat-but-premium aesthetic
+ * - Single shadow layer
+ * - No interaction glow
+ * - Tight 4px/8px/12px spacing rhythm
+ * - Pill-shaped social buttons (not circles)
  */
 export default function ArchivalIntroCardMobile({ socials }: MobileCardProps) {
   const prefersReducedMotion = useReducedMotion();

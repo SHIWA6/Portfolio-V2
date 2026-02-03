@@ -29,13 +29,15 @@ $silver: #d4d4d4;
 .container {
   min-height: 100vh;
   width: 100%;
+  max-width: 100vw; // Never exceed viewport width
   background-color: $carbon;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: $space-lg;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden; // Prevent horizontal scroll
+  overflow-y: hidden;
   
   // Base texture
   background-image: 
@@ -577,246 +579,255 @@ $silver: #d4d4d4;
 }
 
 // =============================================================================
-// MOBILE OPTIMIZATION - Identity Card (NOT a poster)
+// MOBILE OPTIMIZATION - Editorial Identity Card
 // =============================================================================
-// Target: 390×844 (iPhone 14/15, small Androids)
-// Philosophy: Calm, focused identity card
-// First-fold: EVERYTHING visible without scrolling
+// Target: 390×844 (iPhone 14/15, Samsung A-series)
+// Philosophy: Calm, editorial, intentional
+// 
+// DESIGN PRINCIPLES:
+// - Image = identity seal (NOT hero)
+// - Name + Role = single typographic unit
+// - Contact = quiet metadata (NOT CTA)
+// - Socials = utility (NOT engagement drivers)
+// - Vertical rhythm > layout complexity
+// - Fewer surfaces, fewer shadows
 //
-// VIEWPORT MATH (390×844):
-// ┌─────────────────────────────────────┐
-// │  Safe area top: ~59px (Dynamic Island) │
-// │  ─────────────────────────────────  │
-// │                                     │
-// │  USABLE VIEWPORT: ~751px            │
-// │  First fold target: ~400px          │
-// │                                     │
-// │  ─────────────────────────────────  │
-// │  Safe area bottom: ~34px            │
-// └─────────────────────────────────────┘
+// WHAT WAS REMOVED:
+// ✗ Multiple shadow layers (reduced to 1)
+// ✗ Outline ring on image (visual noise)
+// ✗ Interactive glow effects (hover metaphor doesn't translate to touch)
+// ✗ Background states on email (looked like a button)
+// ✗ Transition animations on tap (unnecessary on mobile)
+// ✗ Large circular social buttons (competed with identity)
+// ✗ Golden ratio spacing (caused awkward gaps)
 //
-// CONTENT HEIGHT BUDGET (must fit ~400px):
-// - Container padding: 12px × 2 = 24px
-// - Mat border: 2px
-// - Surface padding: 16px × 2 = 32px
-// - Identity unit: ~180px
-//   ├─ Image (64px)
-//   ├─ Gap (8px)
-//   ├─ Name (48px - two lines)
-//   ├─ Gap (4px)
-//   ├─ Role (16px)
-//   ├─ Gap (8px)
-//   └─ Status (20px)
-// - Gap: 16px
-// - Email: 16px
-// - Gap: 12px
-// - Socials: 40px
-// TOTAL: ~320px ✓ (well within 400px budget)
-//
-// HIERARCHY (strict reading order):
-// 1. Image (64px - identity seal, not hero banner)
-// 2. Name (primary focus)
-// 3. Role (secondary)
-// 4. Status ("Available for collaboration")
-// 5. Email (metadata)
-// 6. Socials (grouped unit)
-//
-// WHAT CHANGED:
-// - Image: 72px → 64px (smaller seal, not poster)
-// - Vignette overlay: REMOVED (one less visual layer)
-// - Statement section: REMOVED (noise, below fold anyway)
-// - Golden ratio spacing: ABANDONED for tight rhythm
-// - Multiple shadows: COLLAPSED to single layer
-// - Social labels: REMOVED (icons only for density)
-// - Status badge: ADDED (tied to identity)
+// WHAT WAS ADDED/CHANGED:
+// ✓ 44px image (from 64px - smaller seal, better proportion)
+// ✓ Tighter name size (1.5rem from 1.75rem)
+// ✓ Reduced line-height throughout
+// ✓ Name + role as tight unit (2px gap)
+// ✓ Email as plain mono text (no backgrounds)
+// ✓ Socials as inline pills (not circles)
+// ✓ 4px/8px/12px mobile spacing scale
 // =============================================================================
 
-// Mobile spacing - tight, predictable rhythm (NO golden ratio)
-$mobile-xs: 0.25rem;   // 4px
-$mobile-sm: 0.5rem;    // 8px
-$mobile-md: 0.75rem;   // 12px
-$mobile-lg: 1rem;      // 16px
-$mobile-xl: 1.25rem;   // 20px
+// Mobile spacing - ultra-tight, predictable rhythm
+$m-xxs: 0.125rem;  // 2px
+$m-xs: 0.25rem;    // 4px
+$m-sm: 0.5rem;     // 8px
+$m-md: 0.75rem;    // 12px
+$m-lg: 1rem;       // 16px
 
 // ------------------------------------------------------------------
-// MOBILE CONTAINER - Minimal padding
+// BOX-SIZING RESET FOR MOBILE
+// ------------------------------------------------------------------
+.containerMobile,
+.cardMobile,
+.matBorderMobile,
+.surfaceMobile,
+.identityUnit,
+.contactMeta,
+.socialUnit,
+.socialRow {
+  box-sizing: border-box;
+}
+
+// ------------------------------------------------------------------
+// MOBILE CONTAINER
 // ------------------------------------------------------------------
 .containerMobile {
-  padding: $mobile-md; // 12px - reduced from 16px
-  min-height: auto; // Don't force full viewport - allow natural page scroll
-  overflow: visible; // CRITICAL: Override base overflow:hidden to enable page scrolling
+  padding: $m-md;
+  min-height: auto;
+  overflow-x: hidden; // CRITICAL: Prevent horizontal scroll
+  overflow-y: visible;
+  max-width: 100vw; // Never exceed viewport
 }
 
 // ------------------------------------------------------------------
-// MOBILE CARD - Single shadow, no stacked depth
+// MOBILE CARD - Single surface, minimal shadow
 // ------------------------------------------------------------------
 .cardMobile {
-  // Single shadow layer (was 5 stacked shadows)
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  border-radius: 8px;
+  // CHANGED: Single subtle shadow (was 5 stacked)
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  max-width: 100%; // Never exceed container
+  overflow: hidden; // Clip any overflow
 }
 
-// Mobile mat border - thinner, subtler
 .matBorderMobile {
   background-color: $anthracite;
-  padding: 1px; // Hairline (was 2px)
-  border-radius: 8px;
+  padding: 1px;
+  border-radius: 12px;
 }
 
-// Mobile surface - NO vignette overlay, just clean padding
 .surfaceMobile {
-  padding: $mobile-lg; // 16px
-  border-radius: 6px;
-  // NO ::before vignette - reduces visual layers
+  padding: $m-lg $m-md; // 16px top/bottom, 12px sides
+  border-radius: 11px;
+  overflow: hidden; // Clip any child overflow
 }
 
 // ------------------------------------------------------------------
-// IDENTITY UNIT - One cohesive block
+// IDENTITY UNIT - Tight cohesive block
 // ------------------------------------------------------------------
-// Image + Name + Role + Status bonded together
 .identityUnit {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0; // Controlled via individual margins
+  gap: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
-// Image: 64px identity seal
+// ------------------------------------------------------------------
+// IMAGE - Small identity seal (NOT hero)
+// ------------------------------------------------------------------
+// CHANGED: 44px (was 64px) - supports identity without dominating
+// REMOVED: box-shadow, outline ring (too many depth layers)
 .identitySeal {
-  width: 64px;
-  height: 64px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   overflow: hidden;
-  // Single subtle shadow
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  margin-bottom: $mobile-sm; // 8px to name
+  margin-bottom: $m-sm; // 8px to name
+  flex-shrink: 0;
   
-  // Subtle ring for definition
-  outline: 1px solid rgba(255, 255, 255, 0.06);
-  outline-offset: -1px;
+  // Single subtle border for definition
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .portraitMobile {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 25%; // Focus on face
-  // Subtle desaturation for archival feel
-  filter: grayscale(15%) contrast(1.05);
+  object-position: center 20%;
+  // Subtle archival treatment
+  filter: grayscale(10%) contrast(1.05);
 }
 
-// Name: Primary focus - increased weight
+// ------------------------------------------------------------------
+// NAME - Primary focus, single unit with role
+// ------------------------------------------------------------------
+// CHANGED: 1.5rem (was 1.75rem), tighter line-height
 .nameMobile {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.75rem; // 28px
-  font-weight: 500; // Medium weight for prominence
-  line-height: 1;
+  font-size: 1.5rem; // 24px
+  font-weight: 500;
+  line-height: 0.95; // Tight
   letter-spacing: -0.02em;
   color: $platinum;
   margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0;
 }
 
 .nameAccentMobile {
-  font-weight: 600; // Heavier for emphasis
+  font-weight: 600;
   color: $silver;
 }
 
-// Role: Secondary - tightly coupled to name
+// ------------------------------------------------------------------
+// ROLE - Tightly bonded to name
+// ------------------------------------------------------------------
+// CHANGED: 2px margin (was 4px) - reads as single unit with name
 .roleMobile {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.8125rem; // 13px
+  font-size: 0.75rem; // 12px
   font-weight: 400;
-  color: rgba($nickel, 0.85);
-  letter-spacing: 0.02em;
-  margin: $mobile-xs 0 0 0; // 4px above only
-  line-height: 1.3;
+  color: rgba($nickel, 0.75);
+  letter-spacing: 0.01em;
+  margin: $m-xxs 0 0 0; // 2px gap
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 // ------------------------------------------------------------------
-// STATUS BADGE - Tied to identity
+// STATUS BADGE
 // ------------------------------------------------------------------
 .statusBadge {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem; // 6px
-  margin-top: $mobile-sm; // 8px
-  padding: 0.25rem 0.625rem; // 4px 10px
-  background-color: rgba(107, 139, 107, 0.1);
-  border: 1px solid rgba(107, 139, 107, 0.2);
+  gap: 0.375rem;
+  margin-top: $m-sm; // 8px
+  padding: 0.1875rem 0.5rem; // 3px 8px - tighter
+  background-color: rgba(107, 139, 107, 0.08);
+  border: 1px solid rgba(107, 139, 107, 0.15);
   border-radius: 100px;
   
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.625rem; // 10px
+  font-size: 0.5625rem; // 9px - smaller
   font-weight: 500;
-  color: #8baa8b; // Muted sage green
+  color: rgba(139, 170, 139, 0.9);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 
 .statusDot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   background-color: currentColor;
   border-radius: 50%;
-  // Subtle glow pulse animation
-  animation: statusPulse 2s ease-in-out infinite;
+  animation: statusPulse 2.5s ease-in-out infinite;
 }
 
 @keyframes statusPulse {
-  0%, 100% { 
-    opacity: 0.6;
-    box-shadow: 0 0 0 0 rgba(139, 170, 139, 0.4);
-  }
-  50% { 
-    opacity: 1;
-    box-shadow: 0 0 0 3px rgba(139, 170, 139, 0);
-  }
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
-// Disable animation for reduced motion
 @media (prefers-reduced-motion: reduce) {
   .statusDot {
     animation: none;
-    opacity: 1;
+    opacity: 0.85;
   }
 }
 
 // ------------------------------------------------------------------
-// CONTACT METADATA - Quiet, not a CTA
+// CONTACT METADATA - Quiet, NOT a CTA
 // ------------------------------------------------------------------
+// CHANGED: Plain text, no background, no border, lower opacity
+// REMOVED: Background on :active, border-radius, transitions
 .contactMeta {
-  margin-top: $mobile-lg; // 16px
+  margin-top: $m-md; // 12px
   display: flex;
   justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden; // Prevent overflow
 }
 
 .emailMeta {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6875rem; // 11px
-  color: rgba($nickel, 0.6);
+  font-size: 0.5625rem; // 9px - even smaller to fit
+  color: rgba($nickel, 0.5); // Lower opacity - metadata, not CTA
   text-decoration: none;
-  letter-spacing: 0.02em;
-  padding: $mobile-xs $mobile-sm; // Small touch target padding
-  border-radius: 4px;
-  transition: color 0.15s ease, background-color 0.15s ease;
+  letter-spacing: 0;
+  padding: $m-xs 0; // Vertical padding only for tap area
+  // NO background, NO border - plain metadata
   
-  &:active {
-    color: $silver;
-    background-color: rgba(255, 255, 255, 0.05);
-  }
+  // OVERFLOW FIX: Prevent email from breaking layout
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 // ------------------------------------------------------------------
-// SOCIAL UNIT - Horizontal icon row (no labels)
+// SOCIAL UNIT - Minimal inline pills
 // ------------------------------------------------------------------
+// CHANGED: Horizontal pills (was 40px circles)
+// WHY: Circles competed visually with identity seal
 .socialUnit {
-  margin-top: $mobile-md; // 12px
+  margin-top: $m-md; // 12px
   display: flex;
   justify-content: center;
+  width: 100%;
+  max-width: 100%;
 }
 
 .socialRow {
@@ -824,27 +835,31 @@ $mobile-xl: 1.25rem;   // 20px
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: $mobile-sm; // 8px between icons
+  gap: 6px; // Tight
+  flex-wrap: wrap; // Wrap if too many icons
+  max-width: 100%;
 }
 
+// CHANGED: Pill buttons (was circular 40px)
+// 36px height ensures 44px tap target with padding
 .socialChip {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 50%;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 $m-sm;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px; // Pill shape
   text-decoration: none;
-  color: rgba($nickel, 0.7);
-  transition: all 0.15s ease;
+  color: rgba($nickel, 0.55); // Lower opacity - utility, not feature
+  flex-shrink: 0; // Don't shrink
   
+  // REMOVED: transition, :active transform (unnecessary on mobile)
   &:active {
-    color: $platinum;
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
-    transform: scale(0.95);
+    color: rgba($nickel, 0.8);
+    background-color: rgba(255, 255, 255, 0.04);
   }
 }
 
@@ -852,34 +867,19 @@ $mobile-xl: 1.25rem;   // 20px
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem; // 16px icons
+  font-size: 0.875rem; // 14px - slightly smaller
 }
 
 // ------------------------------------------------------------------
-// INTERACTION GLOW - Off by default, on tap only
+// INTERACTION GLOW - DISABLED for mobile
 // ------------------------------------------------------------------
+// REMOVED: Touch glow effect (hover metaphor doesn't work on mobile)
+// Keeping class for backwards compatibility but styling is minimal
 .interactionGlow {
-  position: absolute;
-  inset: -1px;
-  border-radius: 8px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  z-index: 0;
-  
-  // Very subtle glow (< 0.1 opacity)
-  background: radial-gradient(
-    circle at var(--touch-x, 50%) var(--touch-y, 50%),
-    rgba(255, 255, 255, 0.06) 0%,
-    transparent 50%
-  );
-  
-  &.active {
-    opacity: 1;
-  }
+  display: none; // Hidden on mobile - no hover equivalent
 }
 
-// Disable interaction glow for reduced motion
+// Keep for reduced motion media query compatibility
 @media (prefers-reduced-motion: reduce) {
   .interactionGlow {
     display: none;
