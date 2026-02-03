@@ -643,8 +643,8 @@ $mobile-xl: 1.25rem;   // 20px
 // ------------------------------------------------------------------
 .containerMobile {
   padding: $mobile-md; // 12px - reduced from 16px
-  min-height: 100vh;
-  min-height: 100dvh; // Dynamic viewport for mobile browsers
+  min-height: auto; // Don't force full viewport - allow natural page scroll
+  overflow: visible; // CRITICAL: Override base overflow:hidden to enable page scrolling
 }
 
 // ------------------------------------------------------------------
