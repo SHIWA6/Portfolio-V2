@@ -28,8 +28,9 @@ $silver: #d4d4d4;
 // ------------------------------------------------------------------
 .container {
   min-height: 100vh;
+  min-height: 100dvh; // Dynamic viewport height - works in Instagram browser
   width: 100%;
-  max-width: 100vw; // Never exceed viewport width
+  max-width: 100%; // Use 100% not 100vw to avoid scrollbar issues
   background-color: $carbon;
   display: flex;
   align-items: center;
@@ -37,7 +38,15 @@ $silver: #d4d4d4;
   padding: $space-lg;
   position: relative;
   overflow-x: hidden; // Prevent horizontal scroll
-  overflow-y: hidden;
+  overflow-y: auto; // CRITICAL: Allow vertical scroll
+  
+  // MOBILE: Remove min-height so page can scroll to other sections
+  @media (max-width: 767px) {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
   
   // Base texture
   background-image: 
@@ -62,6 +71,11 @@ $silver: #d4d4d4;
   // Hardware acceleration for smooth updates
   transform: translateZ(0);
   will-change: background;
+  
+  // MOBILE: Hide fixed overlays to prevent scroll blocking
+  @media (max-width: 767px) {
+    display: none;
+  }
 }
 
 // Film grain overlay for tactile surface
@@ -72,6 +86,11 @@ $silver: #d4d4d4;
   z-index: 50;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  
+  // MOBILE: Hide grain overlay
+  @media (max-width: 767px) {
+    display: none;
+  }
 }
 
 // ------------------------------------------------------------------
@@ -636,11 +655,24 @@ $m-lg: 1rem;       // 16px
 // MOBILE CONTAINER
 // ------------------------------------------------------------------
 .containerMobile {
-  padding: $m-md;
-  min-height: auto;
-  overflow-x: hidden; // CRITICAL: Prevent horizontal scroll
-  overflow-y: visible;
-  max-width: 100vw; // Never exceed viewport
+  padding: $m-md !important;
+  min-height: auto !important; // CRITICAL: Override base .container
+  height: auto !important; // Allow content to determine height
+  overflow-x: hidden !important;
+  overflow-y: visible !important; // CRITICAL: Allow page scroll
+  max-width: 100%;
+  width: 100%;
+  position: relative !important; // Not fixed
+  
+  // CRITICAL FOR IN-APP BROWSERS (Instagram, Facebook, etc.)
+  // Enable touch scrolling
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y; // Allow vertical scroll gestures
+  
+  // Ultra-small screens: tighter padding
+  @media (max-width: 360px) {
+    padding: $m-sm !important; // 8px
+  }
 }
 
 // ------------------------------------------------------------------
@@ -664,6 +696,10 @@ $m-lg: 1rem;       // 16px
   padding: $m-lg $m-md; // 16px top/bottom, 12px sides
   border-radius: 11px;
   overflow: hidden; // Clip any child overflow
+  
+  @media (max-width: 360px) {
+    padding: $m-md $m-sm; // 12px top/bottom, 8px sides
+  }
 }
 
 // ------------------------------------------------------------------
@@ -682,8 +718,7 @@ $m-lg: 1rem;       // 16px
 // ------------------------------------------------------------------
 // IMAGE - Small identity seal (NOT hero)
 // ------------------------------------------------------------------
-// CHANGED: 44px (was 64px) - supports identity without dominating
-// REMOVED: box-shadow, outline ring (too many depth layers)
+// Responsive sizing for ultra-small screens
 .identitySeal {
   width: 44px;
   height: 44px;
@@ -694,6 +729,17 @@ $m-lg: 1rem;       // 16px
   
   // Single subtle border for definition
   border: 1px solid rgba(255, 255, 255, 0.08);
+  
+  @media (max-width: 360px) {
+    width: 40px;
+    height: 40px;
+  }
+  
+  @media (max-width: 320px) {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 6px;
+  }
 }
 
 .portraitMobile {
@@ -708,10 +754,10 @@ $m-lg: 1rem;       // 16px
 // ------------------------------------------------------------------
 // NAME - Primary focus, single unit with role
 // ------------------------------------------------------------------
-// CHANGED: 1.5rem (was 1.75rem), tighter line-height
+// Uses clamp() for responsive scaling on ultra-small screens
 .nameMobile {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.5rem; // 24px
+  font-size: clamp(1.25rem, 6vw, 1.5rem); // 20px min, 24px max
   font-weight: 500;
   line-height: 0.95; // Tight
   letter-spacing: -0.02em;
@@ -721,6 +767,7 @@ $m-lg: 1rem;       // 16px
   flex-direction: column;
   align-items: center;
   gap: 0;
+  width: 100%;
 }
 
 .nameAccentMobile {
@@ -731,10 +778,10 @@ $m-lg: 1rem;       // 16px
 // ------------------------------------------------------------------
 // ROLE - Tightly bonded to name
 // ------------------------------------------------------------------
-// CHANGED: 2px margin (was 4px) - reads as single unit with name
+// Uses clamp() for responsive scaling
 .roleMobile {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.75rem; // 12px
+  font-size: clamp(0.625rem, 3vw, 0.75rem); // 10px min, 12px max
   font-weight: 400;
   color: rgba($nickel, 0.75);
   letter-spacing: 0.01em;
@@ -744,6 +791,7 @@ $m-lg: 1rem;       // 16px
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 0 $m-xs; // Tiny horizontal padding for breathing room
 }
 
 // ------------------------------------------------------------------
@@ -758,13 +806,19 @@ $m-lg: 1rem;       // 16px
   background-color: rgba(107, 139, 107, 0.08);
   border: 1px solid rgba(107, 139, 107, 0.15);
   border-radius: 100px;
+  max-width: 100%;
   
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.5625rem; // 9px - smaller
+  font-size: clamp(0.5rem, 2.5vw, 0.5625rem); // 8px min, 9px max
   font-weight: 500;
   color: rgba(139, 170, 139, 0.9);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
+  
+  @media (max-width: 360px) {
+    padding: 0.125rem 0.375rem; // 2px 6px
+    gap: 0.25rem;
+  }
 }
 
 .statusDot {
@@ -790,44 +844,53 @@ $m-lg: 1rem;       // 16px
 // ------------------------------------------------------------------
 // CONTACT METADATA - Quiet, NOT a CTA
 // ------------------------------------------------------------------
-// CHANGED: Plain text, no background, no border, lower opacity
-// REMOVED: Background on :active, border-radius, transitions
+// Full overflow chain: container → meta → email all have overflow:hidden
 .contactMeta {
   margin-top: $m-md; // 12px
   display: flex;
   justify-content: center;
   width: 100%;
   max-width: 100%;
-  overflow: hidden; // Prevent overflow
+  overflow: hidden; // Part of overflow chain
+  padding: 0 $m-xs; // Small horizontal buffer
 }
 
 .emailMeta {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.5625rem; // 9px - even smaller to fit
+  font-size: clamp(0.5rem, 2.5vw, 0.5625rem); // 8px min, 9px max
   color: rgba($nickel, 0.5); // Lower opacity - metadata, not CTA
   text-decoration: none;
-  letter-spacing: 0;
+  letter-spacing: -0.01em; // Tighter to fit more chars
   padding: $m-xs 0; // Vertical padding only for tap area
   // NO background, NO border - plain metadata
   
-  // OVERFLOW FIX: Prevent email from breaking layout
+  // OVERFLOW FIX: Complete chain for text-overflow to work
+  display: block; // Required for text-overflow
   max-width: 100%;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: center;
+  
+  // Ultra-small screens
+  @media (max-width: 320px) {
+    font-size: 0.4375rem; // 7px
+    letter-spacing: -0.02em;
+  }
 }
 
 // ------------------------------------------------------------------
 // SOCIAL UNIT - Minimal inline pills
 // ------------------------------------------------------------------
-// CHANGED: Horizontal pills (was 40px circles)
-// WHY: Circles competed visually with identity seal
+// Horizontal pills with responsive sizing for all screen widths
 .socialUnit {
   margin-top: $m-md; // 12px
   display: flex;
   justify-content: center;
   width: 100%;
   max-width: 100%;
+  padding: 0 $m-xs; // Buffer from edges
 }
 
 .socialRow {
@@ -838,10 +901,15 @@ $m-lg: 1rem;       // 16px
   gap: 6px; // Tight
   flex-wrap: wrap; // Wrap if too many icons
   max-width: 100%;
+  
+  // Ultra-small screens: tighter gap
+  @media (max-width: 360px) {
+    gap: 4px;
+  }
 }
 
-// CHANGED: Pill buttons (was circular 40px)
-// 36px height ensures 44px tap target with padding
+// Pill buttons with responsive sizing
+// Sizes down on ultra-small screens to prevent overflow
 .socialChip {
   display: flex;
   align-items: center;
@@ -854,12 +922,26 @@ $m-lg: 1rem;       // 16px
   border-radius: 16px; // Pill shape
   text-decoration: none;
   color: rgba($nickel, 0.55); // Lower opacity - utility, not feature
-  flex-shrink: 0; // Don't shrink
+  flex-shrink: 1; // Allow shrinking on small screens
   
-  // REMOVED: transition, :active transform (unnecessary on mobile)
   &:active {
     color: rgba($nickel, 0.8);
     background-color: rgba(255, 255, 255, 0.04);
+  }
+  
+  // Ultra-small screens: smaller chips
+  @media (max-width: 360px) {
+    min-width: 32px;
+    height: 28px;
+    padding: 0 6px;
+    border-radius: 14px;
+  }
+  
+  @media (max-width: 320px) {
+    min-width: 28px;
+    height: 26px;
+    padding: 0 4px;
+    border-radius: 13px;
   }
 }
 
@@ -867,7 +949,15 @@ $m-lg: 1rem;       // 16px
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.875rem; // 14px - slightly smaller
+  font-size: 0.875rem; // 14px
+  
+  @media (max-width: 360px) {
+    font-size: 0.75rem; // 12px
+  }
+  
+  @media (max-width: 320px) {
+    font-size: 0.6875rem; // 11px
+  }
 }
 
 // ------------------------------------------------------------------

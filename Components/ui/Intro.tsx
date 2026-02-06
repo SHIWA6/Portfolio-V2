@@ -1,10 +1,6 @@
 "use client"
-import Introcard from "../UI-comps/Intro/Landing";
+import ArchivalIntroCard from "../UI-comps/Intro/ArchivalIntroCard";
 
 export default function Intro(){
-    return(
-        <div>
-            <Introcard />
-        </div>
-    )
+    return <ArchivalIntroCard />;
 }

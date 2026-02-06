@@ -67,7 +67,7 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
           {/* Image + Name + Role + Status = ONE cohesive block */}
           <section className={styles.identityUnit}>
             
-            {/* Image: 44px seal - supports identity, doesn't dominate */}
+            {/* Image: Responsive seal (44px → 36px on ultra-small) */}
             <div className={styles.identitySeal}>
               <Image
                 src="/images/reall.webp"
@@ -76,7 +76,7 @@ function CardContent({ socials }: { socials: SocialLink[] }) {
                 height={44}
                 priority
                 className={styles.portraitMobile}
-                sizes="44px"
+                sizes="(max-width: 320px) 36px, (max-width: 360px) 40px, 44px"
               />
             </div>
 
@@ -189,7 +189,7 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
             {/* ====== IDENTITY UNIT ====== */}
             <section className={styles.identityUnit}>
               
-              {/* Image: 44px seal */}
+              {/* Image: Responsive seal */}
               <motion.div className={styles.identitySeal} variants={itemVariants}>
                 <Image
                   src="/images/reall.webp"
@@ -198,7 +198,7 @@ function AnimatedMobileCard({ socials }: MobileCardProps) {
                   height={44}
                   priority
                   className={styles.portraitMobile}
-                  sizes="44px"
+                  sizes="(max-width: 320px) 36px, (max-width: 360px) 40px, 44px"
                 />
               </motion.div>
 

@@ -66,12 +66,12 @@ import ArchivalIntroCardMobile from './ArchivalIntroCardMobile';
 function StaticFallback() {
   return (
     <div style={{ 
-      minHeight: '100vh', 
       width: '100%',
       backgroundColor: '#0a0a0a',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      padding: '12px',
     }}>
       <div style={{
         width: '100%',
@@ -82,9 +82,9 @@ function StaticFallback() {
       }}>
         <div style={{
           backgroundColor: '#111111',
-          padding: '3.427rem',
+          padding: '1rem',
           borderRadius: '2px',
-          minHeight: '400px',
+          minHeight: '200px',
         }}>
           {/* Placeholder for progressive loading */}
         </div>
@@ -102,8 +102,13 @@ function StaticFallback() {
  *
  * DECISION LOGIC:
  * 1. Not mounted (SSR): Render static fallback or null
- * 2. Hover capable (pointer: fine): Render Desktop variant
- * 3. Touch only (pointer: coarse): Render Mobile variant
+ * 2. Small viewport (< 768px): ALWAYS render Mobile variant (viewport override)
+ * 3. Hover capable (pointer: fine): Render Desktop variant
+ * 4. Touch only (pointer: coarse): Render Mobile variant
+ *
+ * WHY VIEWPORT OVERRIDE:
+ * When testing in Chrome DevTools responsive mode with a mouse, pointer: fine
+ * is still true. Adding viewport check ensures mobile styles are tested correctly.
  *
  * @returns Appropriate variant based on device capability
  */
@@ -113,6 +118,19 @@ export default function ArchivalIntroCard() {
   
   // Capability detection: Determines which variant to render
   const { isHoverCapable } = useInteractionCapability();
+  
+  // Viewport width detection for mobile override
+  const [isSmallViewport, setIsSmallViewport] = React.useState(false);
+  
+  React.useEffect(() => {
+    const checkViewport = () => {
+      setIsSmallViewport(window.innerWidth < 768);
+    };
+    
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    return () => window.removeEventListener('resize', checkViewport);
+  }, []);
   
   // Social links - memoized to prevent recreation
   const socials: SocialLink[] = useMemo(() => [
@@ -147,10 +165,14 @@ export default function ArchivalIntroCard() {
     return <StaticFallback />;
   }
 
-  // Capability-based rendering
+  // VIEWPORT OVERRIDE: Small screens ALWAYS get mobile variant
+  // This ensures Chrome DevTools responsive mode works correctly
+  if (isSmallViewport) {
+    return <ArchivalIntroCardMobile socials={socials} />;
+  }
+
+  // Capability-based rendering for larger screens
   // isHoverCapable = hasPointer && !hasTouch
-  // True for: mouse, stylus, precision touchpads
-  // False for: finger touch, coarse pointers
   if (isHoverCapable) {
     return <ArchivalIntroCardDesktop socials={socials} />;
   }

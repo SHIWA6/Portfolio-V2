@@ -38,7 +38,7 @@ const Sliding = dynamic(() => import("../ui/Sliding"), {
 
 export default function Hero() {
   return (
-    <div className="relative min-h-screen w-full bg-black selection:bg-white/20 selection:text-white">
+    <div className="relative w-full bg-black selection:bg-white/20 selection:text-white">
       {/* 🔥 DEVELOPER CORNER - Fixed at bottom-left */}
       <Sliding />
       
