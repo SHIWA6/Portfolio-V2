@@ -123,17 +123,7 @@ export default function ContactSection(): React.ReactElement {
       style={{ y: isMobile ? 0 : y }}
       className="relative min-h-screen bg-black overflow-hidden"
     >
-      {/* Animated background elements - DISABLED on mobile for performance */}
-      {!isMobile && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/3 rounded-full blur-3xl animate-pulse delay-1000" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
-        </div>
-      )}
-
-      {/* Grid pattern overlay - simplified on mobile */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] md:opacity-[0.05]" />
+      {/* Animated background elements - REMOVED for cleaner look and performance */}
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-32">
         {/* Hero Section */}
@@ -340,15 +330,6 @@ export default function ContactSection(): React.ReactElement {
           <BackToTopButton onClick={scrollToTop} isMobile={isMobile} />
         </motion.div>
       </div>
-
-      <style jsx>{`
-        .bg-grid-pattern {
-          background-image: 
-            linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-          background-size: 40px 40px;
-        }
-      `}</style>
     </motion.section>
   );
 }

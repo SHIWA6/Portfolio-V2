@@ -26,15 +26,11 @@
    ============================================================================ */
 
 html {
-  /* Enable native momentum scrolling */
   -webkit-overflow-scrolling: touch;
-  /* Prevent scroll-linked effects from blocking scroll */
   scroll-behavior: auto;
-  /* CRITICAL: Allow scroll */
-  overflow-y: auto !important;
+  overflow-y: auto;
   overflow-x: hidden;
-  /* Allow touch gestures */
-  touch-action: pan-y pan-x;
+  touch-action: manipulation;
 }
 
 body {
@@ -43,35 +39,26 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
-  /* CRITICAL: Allow body scroll */
-  overflow-y: auto !important;
+  overflow-y: auto;
   overflow-x: hidden;
-  /* Enable touch scrolling for in-app browsers */
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y pan-x;
-  /* Ensure body is not fixed */
+  touch-action: manipulation;
   position: relative;
   min-height: 100%;
 }
 
-/* MOBILE: Allow natural body scrolling - CRITICAL for performance */
+/* MOBILE: Allow natural body scrolling */
 @media (max-width: 767px) {
   html, body {
-    /* Remove any scroll blocking */
-    overflow-x: hidden !important;
-    overflow-y: auto !important; /* Force allow scroll */
-    /* Native momentum scrolling */
+    overflow-x: hidden;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    /* Prevent overscroll bounce interfering with scroll */
-    overscroll-behavior-y: contain;
+    overscroll-behavior-y: auto;
     overscroll-behavior-x: none;
-    /* CRITICAL: Allow touch scroll gestures */
-    touch-action: pan-y;
-    /* Use dynamic viewport for Instagram/FB browsers */
+    touch-action: manipulation;
     min-height: 100dvh;
-    height: auto !important;
-    /* Ensure not fixed */
-    position: relative !important;
+    height: auto;
+    position: relative;
   }
   
   /* CRITICAL: Disable ALL backdrop-blur on mobile for LCP/Speed Index */
@@ -100,10 +87,7 @@ body {
     filter: none !important;
   }
   
-  /* CRITICAL: Reduce motion for mobile - improves Speed Index */
-  * {
-    scroll-behavior: auto !important;
-  }
+
   
   /* Optimize transforms - only use GPU when necessary */
   .will-change-transform {
@@ -132,22 +116,6 @@ body.macos-active {
   inset: 0;
   width: 100%;
   height: 100%;
-}
-
-/* MOBILE SCROLL EMERGENCY FIX: Ensure body scrolls */
-@media (max-width: 767px) {
-  body:not(.macos-active) {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    position: relative !important;
-    height: auto !important;
-    min-height: 100% !important;
-  }
-  
-  /* Remove any fixed overlays that block scroll */
-  body:not(.macos-active) > div {
-    position: relative !important;
-  }
 }
 
 /* Scroll isolation utility for window content */

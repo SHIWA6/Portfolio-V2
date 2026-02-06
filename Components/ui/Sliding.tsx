@@ -23,6 +23,17 @@ const styles = `
 
 const Sliding: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // Hide on mobile — fixed element blocks touch scrolling
+  if (isMobile) return null;
 
   return (
     <>
