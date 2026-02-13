@@ -39,7 +39,7 @@ const CONTACT_LINKS: ContactLink[] = [
   },
   {
     label: "Download Resume",
-    href: "/resume.pdf",
+    href: "https://drive.google.com/file/d/1FezEg8cKPM0sYP7APc1i7EJW_8gExt6E/view?usp=drive_link",
     icon: "📄",
   },
 ];
