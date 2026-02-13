@@ -21,55 +21,55 @@ type SliderData = readonly SlideItem[];
 /* ================= DATA ================= */
 const slider1: SliderData = [
   {
-    src: "/images/CHEF.webp",
+    src: "/images/leetcode.webp",
     width: 763,
     height: 457,
     color: "#e3e5e7",
-    alt: "Modern architecture design",
+    alt: "DSA_GRIND",
   },
   {
-src: "/images/Screenshot 2025-08-28 012809.webp",    width: 800,
+src: "/images/github.webp",    width: 800,
     height: 500,
     color: "#e3e3e3",
-    alt: "Minimalist interior",
+    alt: "Github_profile",
   },
   {
-    src: "/images/Screenshot 2025-08-28 012715.webp",
-    width: 800,
-    height: 500,
+    src: "/images/pulsetalk.webp",
+    width: 400,
+    height: 300,
     color: "#21242b",
-    alt: "Urban landscape",
+    alt: "PulseTalk_SaaS",
   },
 ] as const;
 
 const slider2: SliderData = [
   {
-    src: '/images/1.webp',
+    src: '/images/os.webp',
     width: 400,
     height: 300,
     color: "#d7d4cf",
-    alt: "Creative workspace",
+    alt: "Operating_System",
   },
   {
-    src: "/images/Screenshot 2025-08-28 012742.webp",
+    src: "/images/Shivaa.webp",
     width: 800,
     height: 500,
     color: "#e5e0e1",
-    alt: "Product showcase",
+    alt: "Portfolio_Website",
   },
   {
-    src: "/images/2.webp",
+    src: "/images/aivora-desk-img.webp",
     width: 800,
     height: 500,
     color: "#d4e3ec",
-    alt: "Digital interface",
+    alt: "Twitter_AI_bot",
   },
   {
     src: "/images/Screenshot 2025-09-28 150550.webp"
     ,width: 768,
     height: 495,
     color: "#e1dad6",
-    alt: "Brand identity",
+    alt: "AI_Assistent",
   },
 ] as const;
 

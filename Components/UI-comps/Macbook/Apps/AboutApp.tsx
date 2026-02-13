@@ -10,11 +10,11 @@ const AboutApp: React.FC = () => (
     <div className="flex gap-4 mt-6">
       <div className="flex items-center gap-2 text-gray-700">
         <Github className="w-5 h-5" />
-        <span>github.com/yourname</span>
+        <span>github.com/SHIWA6</span>
       </div>
       <div className="flex items-center gap-2 text-gray-700">
         <Linkedin className="w-5 h-5" />
-        <span>linkedin.com/in/yourname</span>
+        <span>linkedin.com/in/shiva-pandey-41978a308</span>
       </div>
     </div>
   </div>
